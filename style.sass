@@ -1,5 +1,5 @@
-
-$red: #f0544c
+$red: rgba(240, 84, 76, 1)
+$alpha-red: rgba(240, 84, 76, 0.66)
 $white: #ffffff
 $link-color: #aaaaaa
 $dark-header: #111111
@@ -40,18 +40,16 @@ body::before
     display: block
     background-size: cover
     min-height: 200% // TODO : BIG HACK, needs remplacement
-    z-index: -2
     background-image: repeating-linear-gradient(-10deg, $dark-body-1 0 50rem, $dark-body-2 50rem 100rem)
-    transform: translateZ(-.5px) translate(-20% -20%)
-    width: 158%
+    //transform: translateZ(-.5px) translate(-20%, -20%)
+    width: 100%
 
 #body
     position: relative
     min-height: 100vh
     width: 100%
     transform-style: preserve-3d
-    z-index: -1
-    transform: translateZ(-.1px)
+    transform: translateZ(-.1px) translate(-4%, -1%)
     position: absolute
     top: 6rem
 a
@@ -72,12 +70,19 @@ header
     background-color: $dark-header
     border-bottom: solid thin $red
     font-family: $font_headers
-    box-shadow: $red 0px 5px 5px -5px, inset $red 0px -5px 5px -5px
+    box-shadow: $alpha-red 0 0 10px 0
     padding-left: 1rem
-    position: absolute
+    position: sticky
+    top: 0
     width: 100%
     height: 6rem
-
+    z-index: 100
+    h1
+        margin: 0
+        padding: 1rem
+        a
+            color: $white !important
+            text-decoration: none !important
 
 h1,h2
     font-family: $font_headers
@@ -89,18 +94,18 @@ h1,h2
     margin-left: 1rem
     border-radius: 0.1rem
     display: inline-block
-    background-color: $color-1
+    //background-color: $color-1
     box-shadow: $color-1 0px 0px 2px
     background-image: linear-gradient(90deg, $color-1 0%, $percentage, $color-2 100%-$percentage)
 
 .strength-1 
-    @include strength($red, $dark-header, 25%)
+    @include strength($red, transparent, 25%)
 .strength-2
-    @include strength($red, $dark-header, 50%)
+    @include strength($red, transparent, 50%)
 .strength-3
-    @include strength($red, $dark-header, 75%)
+    @include strength($red, transparent, 75%)
 .strength-4
-    @include strength($red, $dark-header, 100%)
+    @include strength($red, transparent, 100%)
 .strength-item
     display: flex
     flex-flow: row nowrap
@@ -108,9 +113,9 @@ h1,h2
     align-items: baseline
 a.strength-item:hover
     .strength-1 
-        @include strength($white, $dark-header, 25%)
+        @include strength($white, transparent, 25%)
     .strength-2
-        @include strength($white, $dark-header, 50%)
+        @include strength($white, transparent, 50%)
     .strength-3
         @include strength($white, $dark-header, 75%)
     .strength-4
@@ -120,18 +125,36 @@ a.strength-item:hover
 #sidebar 
     color: #d9d9d9
     font-style: italic
-    
     height: min-content
+    width: 24rem
+    margin-right: 2rem
     h2 
         font-style: normal
         font-size: large
     section
         border: solid thin #ffffff
-        border-radius: 0.3rem
-        box-shadow: $red 0 0 4px, inset $red 0 0 4px
+        box-shadow: $alpha-red 0 0 5px, inset $red 0 0 5px
         margin: 1rem
         padding: 0 1rem 0 1rem
-
+        border-image: linear-gradient(156deg, $red -30%, $white) 10 10 10 10
+    section#navmenu
+        overflow: hidden
+        padding: 0
+        box-shadow: $red 0 0 4px
+    a
+        text-decoration: none
+    a.button
+        padding: 0.5rem
+        text-align: center
+        width: 100%
+        display: block
+        background-color: $red
+        font-style: normal
+        color: $white
+        font-weight: bold
+    a.button:not(:last-child)
+        border-bottom: solid thin $white
+    
 .subtitle 
     font-size: 0.75em
     font-weight: 200
@@ -152,6 +175,12 @@ a.strength-item:hover
     .item 
         border-left: solid thin #ffffff
         padding-left: 1rem
+        border-image: linear-gradient(190deg, $red -30%, $white) 10 10 10 10
+
+.icon
+    display: inline-block
+    width: 2em
+    margin-right: 1em
 
 #body 
     display: flex
