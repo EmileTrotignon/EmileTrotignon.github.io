@@ -49,7 +49,8 @@ a:active {
 
 ::selection {
   color: #ffffff;
-  background-color: #f0544c; }
+  background-color: #f0544c;
+  text-shadow: rgba(255, 255, 255, 0.66) 0 0 0.25em; }
 
 header {
   background-color: #111111;
@@ -61,7 +62,8 @@ header {
   top: 0;
   width: 100%;
   height: 6rem;
-  z-index: 100; }
+  z-index: 100;
+  border-image: linear-gradient(170deg, #f0544c 50%, #ffffff) 100; }
   header h1 {
     margin: 0;
     padding: 1rem; }
@@ -171,12 +173,11 @@ a.strength-item:hover .strength-4 {
   #sidebar a.button {
     padding: 0.5rem;
     text-align: center;
-    width: 100%;
     display: block;
-    background-color: #f0544c;
     font-style: normal;
     color: #ffffff;
-    font-weight: bold; }
+    font-weight: bold;
+    margin: 0 0.5rem 0 0.5rem; }
   #sidebar a.button:not(:last-child) {
     border-bottom: solid thin #ffffff; }
 
