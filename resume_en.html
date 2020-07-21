@@ -140,7 +140,7 @@
     }
 
     function createPath(points, center) {
-        var path = new Path();
+        var path = new CompoundPath();
         if (!selected) { 
             path.strokeColor = spotColor;
         } else {
@@ -151,20 +151,17 @@
         for (var i = 0, l = points.length; i < l; i++) {
             var point = points[i];
             var next = points[(i + 1) == points.length ? 0 : i + 1];
+            var prec = points[(i - 1) == 0 ? points.length -1 : i - 1];
             var vector = (next - point) / 2;
-            path.add({
-                point: point + vector,
-                handleIn: -vector,
-                handleOut: vector
-            });
+            path.addChild(new Path.Line(point, next));
         }
-        path.scale(0.95);
-        removeSmallBits(path);
+        path.scale(0.9);
+        //removeSmallBits(path);
         return path;
     }
 
     function onResize() {
-        var margin = 0;
+        var margin = 5;
         bbox = {
             xl: margin,
             xr: view.bounds.width - margin,
