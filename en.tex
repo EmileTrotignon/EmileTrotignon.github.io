@@ -8,23 +8,33 @@
 \usepackage[scale=0.75,a4paper]{geometry}
 \usepackage{babel}
 \usepackage{geometry}
+\usepackage{tikz}
 \geometry{hmargin=2.5cm,vmargin=1.5cm}
 
+\definecolor{white}{HTML}{DDDDDD}
+\definecolor{gray}{HTML}{404040}
+\definecolor{purple}{HTML}{8054cc}
+
+\DeclareRobustCommand{\skills}[1]{ 
+    \texorpdfstring{\protect\tikz[baseline]{
+		\filldraw[fill=white, draw=gray] (0,0) rectangle (5,0.175);
+		\draw[fill=purple](0,0) rectangle ({#1},0.175);
+    }}{skill level {#1}}
+}
+
+
 %----------------------------------------------------------------------------------
-%            informations personnelles
-%type t' = {
-%  title : string;
 %  description : string;
-%  company : string;
+%  company : string;  
 %  location : string;
-%  date : string;
-%}
+%  date : string; 
+%} 
 %----------------------------------------------------------------------------------
 \firstname{Émile}
 \familyname{Trotignon}
 \mobile{+33 7 82 89 83 58}                          
 \extrainfo{Born 30 of July 1999}
-\email{emile.trotignon@gmail.com}                               
+\email{emile.trotignon@gmail.com}                                
 % \photo[64pt][0.4pt]{Image} % 
 \begin{document}
 	\makecvtitle
@@ -40,9 +50,25 @@
 	
 	\section{Experience}
 	
-		\cventry{January 2020}{ICPC SWERC 2019-2020 }{}{Télécom Paris}{}{e.description}
+		\cventry{Summer 2020}{Research internship in computational geometry }{LIRIS laboratory}{Lyon, France}{}{Six weeks internship tutored by David Coeurjolly and Vincent Nivoliers.
+                          My goal during this internship was to uniformly sample the surface of a mesh that could have defects.
+                          I did a lot of C++ programming during those six weeks, and I used tools such as Polyscope and LIBIGL.
+                          My internship report is available here : \url{/files/rapport.pdf}}
 	 
-		\cventry{Summer 2019}{Intern C\# developper }{Eternix Ldt.}{Tel Aviv, Israel}{}{e.description}
+		\cventry{Marsh 2020}{Fullstack Node.js developper }{Junior entreprise of ENS Paris-Saclay}{}{}{During a six week mission for the junior entreprise of ENS Paris-Saclay, 
+                         I contributed to the developpement of the website of Expert People, a new freelancing plateforme.
+                         The technology used were Node.js and Express.js.
+                         For instance I programmed a way to fill out the resume of an expert in one click by using his downloadable Linkedin resume in PDF format.
+                         Expert People's website (in french) : \url{https://expertpeople.co/}}
+	 
+		\cventry{January 2020}{ICPC SWERC 2019-2020 }{}{Télécom Paris}{}{University programmation/algorithms competition.
+                             Participation in teams of three student.
+                             Ranked 37 on 95 teams representing universities from multiple european countries.}
+	 
+		\cventry{Summer 2019}{Intern C\# developper }{Eternix Ldt.}{Tel Aviv, Israel}{}{Two month internship. HSLS shaders, introduction to DirectX and OpenCV, Windows Form developpement.
+                             Greatly rewarding experience abroad.}
+	 
+		\cventry{July 2018}{Front end developer }{École Nationale Supérieure des Sciences de l'Information et des Bibliothèques}{Lyon, France}{}{ I contributed to the graphical intergration of the new website of the head librarian school for a month. You can see their website here : \url{http://www.enssib.fr/}}
 	 
 
 	\section{Languages}
@@ -51,21 +77,21 @@
 		
 	    \cvitem{French}{Native}
 			
-	\section{Technical skills}
+	\section{Technical skills} 
 	
-		\subsection{C++ (very strong)}
+		\subsection{C++\hfill\skills{4)}}
 			I followed a C++ course at university and I also used C++ both for competitive programmation and personnal projects. 
                            
                            I also know C ANSI.
 	
-		\subsection{Python (intermediate)}
+		\subsection{Python\hfill\skills{2)}}
 			I started Python as a hobby in 2013. I also followed courses on scientific computing.
                        
                        I have a few Python projects available on my GitHub page : 
 
                        \url{https://github.com/EmileTrotignon?tab=repositories&q=&type=&language=python}
 	
-		\subsection{C\# (very strong)}
+		\subsection{C\#\hfill\skills{3)}}
 			Good knowledge of C\# : professional experience of 2 month.
 
                          Two learning projects made in this language :
@@ -77,19 +103,23 @@ This project displays a simple texture with DirectX and implement Lanczos interp
 
 Small WinForm application allowing to play the game of Go.
 	
-		\subsection{OCaml (strong)}
+		\subsection{OCaml\hfill\skills{4)}}
 			I had an OCaml course in my first year. 
                 
                          In my third year I programmed a compiler for a subset of the C language :
 
                          \url{https://github.com/EmileTrotignon/mcc}
+                       I also published a package on Opam, the Ocaml package manager : \url{https://github.com/EmileTrotignon/ocaml_template_engine}
 	
-		\subsection{Web development (strong)}
+		\subsection{Web development\hfill\skills{3)}}
 			Front-end : good knowledge of HTML and CSS : one month experience during summer 2018
 
                          Back-end : Professional experience developping a Node.js web app
 	
-		\subsection{Unix (intermediate)}
+		\subsection{Unix\hfill\skills{2)}}
 			I know how to use a Unix system with the command line : file manipulation, Git, SSH
+	
+		\subsection{Scala\hfill\skills{2)}}
+			I developped a tower-defense game in Scala during a team project at school. \url{https://github.com/EmileTrotignon/emiles-s-tower-defense}
 	
 \end{document}
