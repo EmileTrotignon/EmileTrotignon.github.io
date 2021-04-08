@@ -5,7 +5,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[light]{CormorantGaramond}
 \usepackage[T1]{fontenc}
-\usepackage[scale=0.75,a4paper]{geometry}
+\usepackage[scale=1,a4paper]{geometry}
 \usepackage{babel}
 \usepackage{geometry}
 \usepackage{tikz}
@@ -42,7 +42,7 @@
 \begin{document}
 
 	\makecvtitle
-	Je suis étudiant en informatique à l'ENS Paris-Saclay. Je suis très interessé par OCaml et plus généralement la conception de langage et la compilation.  
+	Étudiant en informatique à l'ENS Paris-Saclay, je suis très interessé par OCaml et plus généralement par la conception de langage et la compilation.  
 	\section{Formation}
 	
 		\cventry{2020 -- 2022 }{Master Parisien de Recherche en Informatique}{École Normale Supérieure Paris-Saclay}{}{}{}
@@ -65,15 +65,16 @@
 	 
 		\cventry{Mars 2020}{Développeur Node.js fullstack }{Junior entreprise de l'ENS Paris-Saclay}{}{}{Dans le cadre d'un mission pour la junior entreprise de l'ENS Paris-Saclay de 6 semaines,
                           j'ai participé au développement du site web d'Expert People, une nouvelle plateforme de freelancing.
-                         Les technologies utilisés sont Node.js et Express.js. 
-                         J'ai notamment mis en place un système pour remplir automatiquement le CV d'un expert avec son CV Linkedin sous format PDF.
-                         Le site d'Expert People\url{https://expertpeople.co/}}
+                         Les technologies utilisées sont Node.js et Express.js. 
+                         J'ai notamment mis en place un système pour remplir automatiquement le formulaire 
+                         de CV d'un utilisateur avec son CV Linkedin sous format PDF.
+                         Le site d'Expert People : \url{https://expertpeople.co/}}
 	 
 		\cventry{Janvier 2020}{ICPC SWERC 2019-2020 }{}{Télécom Paris}{}{Compétition de programmation/algorithmique universitaire. 
                              Participation au sein d'une équipe de trois.
-                             Classement de mon équipe : 37 sur 95 équipes répresentant des universités de plusieurs pays européens}
+                             Classement de mon équipe : 37 sur 95 équipes répresentant des universités de plusieurs pays européens.}
 	 
-		\cventry{Été 2019}{Développeur stagiaire C\# }{Eternix Ldt.}{Tel Aviv, Israel}{}{Stage de 2 mois. Écriture de shaders HLSL, découverte de DirectX, développement Windows Form, expérience avec OpenCV.
+		\cventry{Été 2019}{Développeur stagiaire C\# }{Eternix Ldt.}{Tel Aviv, Israel}{}{Stage de 2 mois. Écriture de shaders HLSL, découverte de DirectX, Windows Form, expérience avec OpenCV.
                              Expérience extrêmement enrichissante dans une entreprise étrangère}
 	 
 		\cventry{Juillet 2018}{Développeur front-end }{École Nationale Supérieure des Sciences de l'Information et des Bibliothèques}{Lyon, France}{}{ Lors d'un emploi estival d'un mois, j'ai contribué à l'intégration du nouveau site web de l'ENSSIB. Le nouveau site est visible ici :\url{http://www.enssib.fr/}}
@@ -87,51 +88,37 @@
 			
 	\section{Compétences techniques}
 	
-		\subsection{OCaml\hfill\skills{4}}
-			Je programme en Ocaml depuis le début de mes études, ce langage m'intéresse particulièrement.
-                
-                         Lors de mes études à l'ENS, j'ai écrit en OCaml un compilateur pour un sous-ensemble du langage C :
-
-                         \url{https://github.com/EmileTrotignon/mcc}
-                       J'ai aussi publié un paquet sur Opam, le gestionnaire de paquets d'Ocaml `: \url{https://github.com/EmileTrotignon/ocaml_template_engine}
+		\subsection{Compilation}
+			La compilation des langages de programmation est un sujet qui m'intéresse beaucoup.
+            Je suis à l'heure actuelle un cours de compilation à l'Université de Paris, qui a pour but d'implémenter un language de programmation du style ML.
+            Pour l'instant, il ne m'est pas permis de partager mon code, mais la description du cours est disponible ici : \url{https://www.irif.fr/~guatto//teaching/20-21/compil/syllabus-compil-20-21.pdf}.
+            J'ai aussi programmé en 2019 un compilateur pour un sous-ensemble du langage C : \url{https://github.com/EmileTrotignon/mcc}
 	
-		\subsection{C++\hfill\skills{4}}
-			Cours de C++ suivi \`a l'université. Utilisation du C++ pour des projets personnels utilisant des concept plus avancés, ainsi que pour de la programmation compétitive.
+		\subsection{Informatique fondamentale}
+			Durant mes études, j'ai étudié différents aspects de l'informatique théorique : 
+            Sémantique des langages de programmation, langages formels, calculabilité, logique. 
+            Cela m'apporte beaucoup dans ma compréhension de l'informatique en général, 
+            en plus des compétences spécifiques à chaque domaine.
 	
-	                Je sais aussi programmer en C ANSI.
+		\subsection{Programmation fonctionnelle}
+			J'aime beaucoup les langages de programmation fonctionnels, ainsi que les systèmes de type avancés.
+                          Je programme en Ocaml depuis le début de mes études, et j'apprécie beaucoup ce langage.
+                          J'ai un peu d'expérience en Scala ainsi qu'en Rust, et j'ai beaucoup expérimenté avec les fonctionnalités avancées de C++.
+                          J'ai aussi publié un paquet sur Opam, le gestionnaire de paquets d'Ocaml : \url{https://github.com/EmileTrotignon/ocaml_template_engine}.
+                         Il contient un réecriveur PPX, ainsi qu'un petit parser écrit avec Menhir.
 	
-		\subsection{Python\hfill\skills{2}}
-			Programmation en Python comme loisir depuis 2013. 
-                         J'ai également suivi des cours de calcul scientifique en Python lors de mon année de CPGE .
+		\subsection{GUIs}
+			Expérience avec quelques frameworks d'interfaces graphiques : 
+                         Qt et Dear ImGUI pour C++, WinForm pour C\#, Swing pour Scala, Tkinter pour Python
 	
-	                       J'ai plusieurs projets en python disponibles sur ma page GitHub :
-
-                         \url{https://github.com/EmileTrotignon?tab=repositories&q=&type=&language=python}
-	
-		\subsection{C\#\hfill\skills{3}}
-			Bonne connaissance de C\# : expérience professionelle de ce langage de 2 mois.
-
-                         Deux projets d'apprentissage réalisés dans le cadre de ce stage :
-
-                         \url{https://github.com/EmileTrotignon/InterpolationShaders}
-
-Ce projet affiche une image avec DirectX et permet d'utiliser l'interpolation de Lanczos sur celle-ci.
-
-\url{https://github.com/EmileTrotignon/CSGoban}
-
-Petite application permettant de jouer au jeu de Go.
-	
-		\subsection{Développement web\hfill\skills{3}}
+		\subsection{Développement web}
 			Front-end : Bonne connaissance de HTML/CSS. J'ai exercé cette compétence professionnellement lors de l'été 2018.
 	
-	                       Back-end : Experience professionnelle de développement d'une application Node.js .
+	                       Back-end : Expérience professionnelle de développement d'une application Node.js .
 	
-		\subsection{Unix\hfill\skills{2}}
-			Je sais utiliser un système Unix avec la ligne de commande : manipulation de fichier, Git, SSH 
-	
-		\subsection{Scala\hfill\skills{2}}
-			J'ai developpé un jeu de type tower-defense en Scala dans le cadre d'un projet de programmation lors de mes études à l'ENS.
-                  Il s'agissait d'un projet à deux.
-                  \url{https://github.com/EmileTrotignon/emiles-s-tower-defense}
+		\subsection{Divers}
+			Utilisation d'un système Unix avec la ligne de commande : manipulation de fichier, Git, SSH. 
+                           Édition d'image avec GIMP.
+                           Rédaction de documents en Latex. 
 	
 \end{document}
