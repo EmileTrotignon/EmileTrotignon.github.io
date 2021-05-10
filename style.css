@@ -70,15 +70,17 @@ h1, h2 {
 .strength-1 {
   height: 0.5em;
   width: 8em;
+  min-width: 8em;
   margin-left: 1rem;
   border-radius: 0.1rem;
   display: inline-block;
   box-shadow: #f0544c 0px 0px 2px;
-  background-image: linear-gradient(90deg, #f0544c 0%, 25%, transparent 75%); }
+  background-image: linear-gradient(90deg, #f0544c 0%, 30%, transparent 70%); }
 
 .strength-2 {
   height: 0.5em;
   width: 8em;
+  min-width: 8em;
   margin-left: 1rem;
   border-radius: 0.1rem;
   display: inline-block;
@@ -88,20 +90,22 @@ h1, h2 {
 .strength-3 {
   height: 0.5em;
   width: 8em;
+  min-width: 8em;
   margin-left: 1rem;
   border-radius: 0.1rem;
   display: inline-block;
   box-shadow: #f0544c 0px 0px 2px;
-  background-image: linear-gradient(90deg, #f0544c 0%, 75%, transparent 25%); }
+  background-image: linear-gradient(90deg, #f0544c 0%, 70%, transparent 30%); }
 
 .strength-4 {
   height: 0.5em;
   width: 8em;
+  min-width: 8em;
   margin-left: 1rem;
   border-radius: 0.1rem;
   display: inline-block;
   box-shadow: #f0544c 0px 0px 2px;
-  background-image: linear-gradient(90deg, #f0544c 0%, 100%, transparent 0%); }
+  background-image: linear-gradient(90deg, #f0544c 0%, 90%, transparent 10%); }
 
 .strength-item {
   display: flex;
@@ -112,14 +116,16 @@ h1, h2 {
 a.strength-item:hover .strength-1 {
   height: 0.5em;
   width: 8em;
+  min-width: 8em;
   margin-left: 1rem;
   border-radius: 0.1rem;
   display: inline-block;
   box-shadow: #ffffff 0px 0px 2px;
-  background-image: linear-gradient(90deg, #ffffff 0%, 25%, transparent 75%); }
+  background-image: linear-gradient(90deg, #ffffff 0%, 30%, transparent 70%); }
 a.strength-item:hover .strength-2 {
   height: 0.5em;
   width: 8em;
+  min-width: 8em;
   margin-left: 1rem;
   border-radius: 0.1rem;
   display: inline-block;
@@ -128,19 +134,21 @@ a.strength-item:hover .strength-2 {
 a.strength-item:hover .strength-3 {
   height: 0.5em;
   width: 8em;
+  min-width: 8em;
   margin-left: 1rem;
   border-radius: 0.1rem;
   display: inline-block;
   box-shadow: #ffffff 0px 0px 2px;
-  background-image: linear-gradient(90deg, #ffffff 0%, 75%, transparent 25%); }
+  background-image: linear-gradient(90deg, #ffffff 0%, 70%, transparent 30%); }
 a.strength-item:hover .strength-4 {
   height: 0.5em;
   width: 8em;
+  min-width: 8em;
   margin-left: 1rem;
   border-radius: 0.1rem;
   display: inline-block;
   box-shadow: #ffffff 0px 0px 2px;
-  background-image: linear-gradient(90deg, #ffffff 0%, 100%, transparent 0%); }
+  background-image: linear-gradient(90deg, #ffffff 0%, 90%, transparent 10%); }
 
 #sidebar {
   color: #d9d9d9;

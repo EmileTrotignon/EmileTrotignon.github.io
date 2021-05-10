@@ -1,7 +1,7 @@
 
 \documentclass[10pt, a4paper, roman, french]{moderncv}
-\moderncvstyle{classic}                             
-\moderncvcolor{purple}                              
+\moderncvstyle{classic}
+\moderncvcolor{purple}
 \usepackage[utf8]{inputenc}
 \usepackage[light]{CormorantGaramond}
 \usepackage[T1]{fontenc}
@@ -15,7 +15,7 @@
 \definecolor{gray}{HTML}{404040}
 \definecolor{purple}{HTML}{8054cc}
 
-\DeclareRobustCommand{\skills}[1]{ 
+\DeclareRobustCommand{\skills}[1]{
     \texorpdfstring{\protect\tikz[baseline]{
 		\filldraw[fill=white, draw=gray] (0,0) rectangle (5,0.175);
 		\draw[fill=purple](0,0) rectangle ({#1},0.175);
@@ -25,20 +25,20 @@
 
 %----------------------------------------------------------------------------------
 %  description : string;
-%  company : string;  
+%  company : string;
 %  location : string;
-%  date : string; 
-%} 
+%  date : string;
+%}
 %----------------------------------------------------------------------------------
 \firstname{Émile}
 \familyname{Trotignon}
-\mobile{+33 7 82 89 83 58}                          
+\mobile{+33 7 82 89 83 58}
 \extrainfo{Born July 30th, 1999}
-\email{emile.trotignon@gmail.com}                                
-% \photo[64pt][0.4pt]{Image} % 
+\email{emile.trotignon@gmail.com}
+% \photo[64pt][0.4pt]{Image} %
 \begin{document}
 	\makecvtitle
-	As a master's student in Computer Science at ENS Paris-Saclay, I am very interested in OCaml, language design and compilation.
+	As a master's student in Computer Science at ENS Paris-Saclay, I am very interested in OCaml, programming languages and compilation.
 	\section{Formation}
 	
 		\cventry{2020 -- 2022 }{Master's degree in Computer Science Research (MPRI)}{École Normale Supérieure Paris-Saclay}{}{}{}
@@ -53,26 +53,21 @@
 	
 	\section{Experience}
 	
-		\cventry{Summer 2020}{Research internship in computational geometry }{LIRIS laboratory}{Lyon, France}{}{Six weeks internship tutored by David Coeurjolly and Vincent Nivoliers.
-                          My goal during this internship was to uniformly sample the surface of a potentially imperfect mesh.
-                          During the six weeks, I spent a good portion of my time programming in C++ and I used tools such as Polyscope and LIBIGL.
-                          My internship report is available here : \url{https://emiletrotignon.github.io/files/rapport.pdf}}
+		\cventry{Spring 2021}{Research internship in computer science }{Inria Paris, team Cambium}{Paris, France}{}{Five month internship tutored by François Pottier. Improvements to Menhir, a LR(1) parser generator for OCaml : Typing with GADTs, general performances.}
 	 
-		\cventry{Marsh 2020}{Fullstack Node.js developer }{Junior entreprise of ENS Paris-Saclay}{}{}{During a six week mission for the junior entreprise of ENS Paris-Saclay, 
-                         I contributed to the website development of Expert People, a new freelancing platform.
-                         The technologies used were Node.js and Express.js.
-                         One of my achievements was programming a way of filling out the resume form of a user in one click by using their downloadable Linkedin resume in PDF format.
-                         Expert People's website (in french) : \url{https://expertpeople.co/}}
+		\cventry{Summer 2020}{Research internship in computational geometry }{LIRIS laboratory}{Lyon, France}{}{Six weeks internship tutored by David Coeurjolly and Vincent Nivoliers. My goal during this internship was to uniformly sample the surface of a potentially imperfect mesh. During the six weeks, I spent a good portion of my time programming in C++ and I used tools such as Polyscope and LIBIGL. My internship report is available here : \url{https://emiletrotignon.github.io/files/rapport.pdf}}
+	 
+		\cventry{Marsh 2020}{Fullstack Node.js developer }{Junior entreprise of ENS Paris-Saclay}{}{}{During a six week mission for the junior entreprise of ENS Paris-Saclay, I contributed to the website development of Expert People, a new freelancing platform. The technologies used were Node.js and Express.js. One of my achievements was programming a way of filling out the resume form of a user in one click by using their downloadable Linkedin resume in PDF format.
+Expert People's website (in french) : \url{https://expertpeople.co/}}
 	 
 		\cventry{January 2020}{ICPC SWERC 2019-2020 }{}{Télécom Paris}{}{University programming/algorithms competition.
-                             Participation in teams of three students.
-                             Ranked 37th of 95 teams representing universities from multiple european countries.}
+Participation in teams of three students.
+Ranked 37th of 95 teams representing universities from multiple european countries.}
 	 
 		\cventry{Summer 2019}{Intern C\# developer }{Eternix Ldt.}{Tel Aviv, Israel}{}{Two month internship. HSLS shaders, introduction to DirectX and OpenCV, Windows Form development.
-                             Greatly rewarding experience abroad.}
+Greatly rewarding experience abroad.}
 	 
-		\cventry{July 2018}{Front end developer }{École Nationale Supérieure des Sciences de l'Information et des Bibliothèques}{Lyon, France}{}{For a month long, I contributed to the graphical integration of the new website for ENSSIB, the French school for library curators.
-                         You can see their website here : \url{http://www.enssib.fr/}}
+		\cventry{July 2018}{Front end developer }{École Nationale Supérieure des Sciences de l'Information et des Bibliothèques}{Lyon, France}{}{For a month, I contributed to the graphical integration of the new website for ENSSIB, the French school for library curators. You can see their website here :\url{http://www.enssib.fr/}}
 	 
 
 	\section{Languages}
@@ -80,40 +75,36 @@
 	    \cvitem{English}{Fluent}
 		
 	    \cvitem{French}{Native}
-			
-	\section{Technical skills} 
+		
+	\section{Technical skills}
 	
 		\subsection{Compilation}
-			I am very interested by compilation.
-                         I am currently following a course on compilation at the University of Paris. 
-                         The goal of the course is to implement an ML-like programming language.
-                         For now, I am not allowed to share the code I wrote for the course, but the description is available here (in french) : \url{https://www.irif.fr/~guatto//teaching/20-21/compil/syllabus-compil-20-21.pdf}.
-                         I have also programmed a compiler for a subset of the C language in 2019 : \url{https://github.com/EmileTrotignon/mcc}
+			I am very interested by compilation. I am currently following a course on compilation at the University of Paris. The goal of the course is to implement an ML-like programming language.
+For now, I am not allowed to share the code I wrote for the course, but the description is available here (in french) : \url{https://www.irif.fr/~guatto//teaching/20-21/compil/syllabus-compil-20-21.pdf}.
+I have also programmed a compiler for a subset of the C language in 2019 : \url{https://github.com/EmileTrotignon/mcc}
 	
 		\subsection{Fundamental Computer Science}
 			I have studied different aspect of fundamental Computer Science :
-             Programming languages semantics, formal languages, calculability, logic. 
-             This enhances my understanding of computer science in general, in addition to the particular skills acquired.
+Programming languages semantics, formal languages, calculability, logic.
+This enhances my understanding of computer science in general, in addition to the particular skills acquired.
 	
 		\subsection{Functionnal programming}
-			 I really enjoy functionnal programming languages, as well as advanced type systems.
-                         I have been programming in OCaml since my first year of university, and I am very passionate about this language.
-                         I have some experience with Scala and Rust, and I had a lot of fun exploring advanced C++ features.
-                         I also published a package on Opam, the Ocaml package manager : \url{https://github.com/EmileTrotignon/ocaml_template_engine}.
-                         It includes a PPX rewriter, and a small parser written with Menhir.
+			 I really enjoy functionnal programming languages, as well as advanced type systems. I have been programming in OCaml since my first year of university, and I am very passionate about this language. I have some experience with Scala and Rust, and I had a lot of fun exploring advanced C++ features.
+I also published a package on Opam, the Ocaml package manager : \url{https://github.com/EmileTrotignon/ocaml_template_engine}.
+It includes a PPX rewriter, and a small parser written with Menhir.
 	
 		\subsection{GUIs}
 			I have experience with a few frameworks for programming GUIs :
-                       Qt and Dear ImGUI with C++, WinForm with C\#, Swing with Scala, Tkinter with Python.
+Qt and Dear ImGUI with C++, WinForm with C\#, Swing with Scala, Tkinter with Python.
 	
 		\subsection{Web development}
 			Front-end : Good knowledge of HTML and CSS. One month experience during the summer of 2018.
 
-                         Back-end : Professional experience developing a Node.js web app. 
+Back-end : Professional experience developing a Node.js web app.
 	
 		\subsection{Miscellaneous}
 			Use of a Unix system with the command line : file manipulation, Git, SSH.
-                         Image editing with GIMP.
-                        Typesetting with Latex.
+Image editing with GIMP.
+Typesetting with Latex.
 	
 \end{document}

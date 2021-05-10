@@ -32,7 +32,7 @@ body
     font-family: $font_body
     font-size: 14px
     //perspective: 1px
-/*body::before 
+/*body::before
  content: ''
  position: absolute
  top: 0
@@ -93,6 +93,7 @@ h1,h2
 @mixin strength($color-1, $color-2, $percentage)
     height: 0.5em
     width: 8em
+    min-width: 8em
     margin-left: 1rem
     border-radius: 0.1rem
     display: inline-block
@@ -101,13 +102,13 @@ h1,h2
     background-image: linear-gradient(90deg, $color-1 0%, $percentage, $color-2 100%-$percentage)
 
 .strength-1
-    @include strength($red, transparent, 25%)
+    @include strength($red, transparent, 30%)
 .strength-2
     @include strength($red, transparent, 50%)
 .strength-3
-    @include strength($red, transparent, 75%)
+    @include strength($red, transparent, 70%)
 .strength-4
-    @include strength($red, transparent, 100%)
+    @include strength($red, transparent, 90%)
 .strength-item
     display: flex
     flex-flow: row nowrap
@@ -115,13 +116,13 @@ h1,h2
     align-items: baseline
 a.strength-item:hover
     .strength-1
-        @include strength($white, transparent, 25%)
+        @include strength($white, transparent, 30%)
     .strength-2
         @include strength($white, transparent, 50%)
     .strength-3
-        @include strength($white, transparent, 75%)
+        @include strength($white, transparent, 70%)
     .strength-4
-        @include strength($white, transparent, 100%)
+        @include strength($white, transparent, 90%)
 
 #sidebar
     color: #d9d9d9
