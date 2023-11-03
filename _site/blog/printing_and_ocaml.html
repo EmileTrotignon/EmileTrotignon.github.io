@@ -1,0 +1,363 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Émile Trotignon's personal page</title>
+    <link rel="stylesheet" href="/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap" rel="stylesheet">
+
+    <script src="/js/rhill-voronoi-core.js"></script>
+    <script src="https://kit.fontawesome.com/0c027fe19b.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.11/paper-full.min.js"></script>
+    <script type="text/paperscript"  canvas="canvas-1">
+    var voronoi =  new Voronoi();
+    var sites = generateBeeHivePoints(view.size / 75, true);
+    var speeds = generateSpeeds(view.size / 75);
+    console.log(speeds);
+    var forces = generateSpeeds(view.size / 75);
+    var bbox, diagram;
+    var oldSize = view.size;
+    var spotColor = new Color('rgba(240, 84, 76, 0.66)');
+    var mousePos = view.center;
+    var selected = false;
+
+    onResize();
+
+    function onMouseDown(event) {
+        sites.push(event.point);
+        renderDiagram();
+    }
+
+    function onMouseMove(event) {
+        mousePos = event.point;
+        mousePos.speed = new Point(0.0);
+        mousePos.force = new Point(0.0);
+        if (event.count == 0)
+        {
+            sites.push(mousePos);
+            speeds.push(new Point(0,0));
+            forces.push(new Point(0,0));
+        }
+
+        sites[sites.length - 1] = mousePos;
+        speeds[speeds.length - 1] = new Point(0,0);
+        forces[forces.length - 1] = new Point(0,0);
+    }
+
+    function moveSites() {
+      for (var i = 0; i < sites.length; i++) {
+        if ((sites[i] + speeds[i]).isInside(new Rectangle(new Point(bbox.xl, bbox.yt), new Point(bbox.xr, bbox.yb))))
+          sites[i] += speeds[i];
+        else
+          speeds[i] *= -1;
+        //sites[i] = moveToRect(sites[i], new Rectangle(new Point(bbox.xl, bbox.yt), new Point(bbox.xr, bbox.yb)));
+        var length = Math.sqrt(speeds[i].x * speeds[i].x + speeds[i].y * speeds[i].y);
+        speeds[i] += forces[i];
+        var new_length = Math.sqrt(speeds[i].x * speeds[i].x + speeds[i].y * speeds[i].y);
+        speeds[i].x = speeds[i].x * length / new_length;
+        speeds[i].y = speeds[i].y * length / new_length; 
+        forces[i] = (Point.random() - new Point(0.5, 0.5)) / 100;
+      }
+    }
+
+    function moveToRect(point, rect) {
+      point2 = new Point(point);
+      while(!point2.isInside(rect)) {
+        if (point2.x < rect.left)
+          point2.x += rect.width;
+        if (point2.x > rect.right)
+          point2.x -= rect.width;
+        if (point2.y < rect.top)
+          point2.y += rect.height;
+        if (point2.y > rect.bottom)
+          point2.y -= rect.height;
+      }
+      return point2;
+    }
+
+    function renderDiagram() {
+        project.activeLayer.children = [];
+        moveSites();
+        var diagram = voronoi.compute(sites, bbox);
+        if (diagram) {
+            for (var i = 0, l = sites.length; i < l; i++) {
+                var cell = diagram.cells[sites[i].voronoiId];
+                if (cell) {
+                    var halfedges = cell.halfedges,
+                        length = halfedges.length;
+                    if (length > 2) {
+                        var points = [];
+                        for (var j = 0; j < length; j++) {
+                            v = halfedges[j].getEndpoint();
+                            points.push(new Point(v));
+                        }
+                        createPath(points, sites[i]);
+                    }
+                }
+            }
+        }
+    }
+
+    function removeSmallBits(path) {
+        var averageLength = path.length / path.segments.length;
+        var min = path.length / 50;
+        for(var i = path.segments.length - 1; i >= 0; i--) {
+            var segment = path.segments[i];
+            var cur = segment.point;
+            var nextSegment = segment.next;
+            var next = nextSegment.point + nextSegment.handleIn;
+            if (cur.getDistance(next) < min) {
+                segment.remove();
+            }
+        }
+    }
+
+    function generateBeeHivePoints(size, loose) {
+        var points = [];
+        var col = view.size / size;
+        for(var i = -1; i < size.width + 1; i++) {
+            for(var j = -1; j < size.height + 1; j++) {
+                var point = new Point(i, j) / new Point(size) * view.size + col / 2;
+                if(j % 2)
+                    point += new Point(col.width / 2, 0);
+                if(loose)
+                    point += (col) * Point.random() - col / 4;
+                points.push(point);
+            }
+        }
+        return points;
+    }
+
+    function generateSpeeds(size)
+    {
+      var points = [];
+        for(var i = -1; i < size.width + 1; i++) {
+            for(var j = -1; j < size.height + 1; j++) {
+                var speed = new Point(Math.random()/8, Math.random()/4);
+                points.push(speed);
+            }
+        }
+        return points;
+    }
+
+    function createPath(points, center) {
+        var paths = new CompoundPath();
+        if (!selected) {
+            paths.strokeColor = spotColor;
+        } else {
+            paths.fullySelected = selected;
+        }
+        //paths.closed = true;
+
+        for (var i = 0, l = points.length; i < l; i++) {
+            var point = points[i];
+            var next = points[(i + 1) == points.length ? 0 : i + 1];
+            var prec = points[(i - 1) == 0 ? points.length -1 : i - 1];
+            var vector = (next - point) / 2;
+            var path = new Path.Line(point, next);
+            path.scale(0.66);
+
+            //var circle = new Path.Circle(point, 1);
+            //circle.fillColor = new Color("white");
+            paths.addChild(path);
+            //paths.addChild(circle);
+        }
+        //removeSmallBits(path);
+
+        return paths;
+    }
+
+    function onResize() {
+        var margin = 0;
+        bbox = {
+            xl: margin,
+            xr: view.bounds.width - margin,
+            yt: margin,
+            yb: view.bounds.height - margin
+        };
+        for (var i = 0, l = sites.length; i < l; i++) {
+            sites[i] = sites[i] * view.size / oldSize;
+        }
+        oldSize = view.size;
+    }
+    function onFrame(event) {
+        renderDiagram();
+    }
+    /*function onKeyDown(event) {
+        if (event.key == 'space') {
+            selected = !selected;
+            renderDiagram();
+        }
+    }*/
+    </script>
+  </head>
+  <body>
+    <header>
+      <canvas resize="true" id="canvas-1" style="user-select: none;" data-paper-scope="1"></canvas>
+      <h1>
+        <a href="/">Émile Trotignon</a>
+      </h1>
+    </header>
+    <div id="body">
+    <nav id="sidebar">
+        <section id="navmenu"><a 
+        class="button
+               
+              "
+        
+        href="/">Index</a><a 
+        class="button
+               
+              "
+        
+        href="/software">Software</a><a 
+        class="button
+               
+              "
+        
+        href="/resume">Resume</a><a 
+        class="button
+                current
+              "
+        
+        id="blog-navlink"         
+        
+        href="/blog">Blog</a></section>
+
+        
+<section>
+    <p>
+        <a href="https://github.com/EmileTrotignon"><img src="/icons/github-icon.svg" class="icon"> GitHub </a>
+    </p>
+    <p>
+        <a href="mailto:emile.trotignon@gmail.com"><span class="icon"><i class="fas fa-envelope fa-lg"></i></span> emile.trotignon@gmail.com</a>
+    </p>
+    <p>
+        <span class="icon"><i class="fas fa-phone fa-lg"></i></span> +33 7 82 89 83 58
+    </p>
+    <p>
+        Born July 30th, 1999
+    </p>
+</section>
+    </nav>
+    
+<ul id="breadcrumbs"><li><a href="/">~</a></li><li><a href="/blog">blog</a></li><li><a href="/blog/printing_and_ocaml.md">printing_and_ocaml.md</a></li>
+</ul> 
+    <div id="content-wrapper">
+        <article id="content">
+            <h1 id="printing-and-ocaml">Printing and OCaml</h1>
+<p>Printing values for debugging purposes is often presented as one of the big pain
+points of the OCaml experience, and I agree with that sentiment. There is no
+simple way to print most datatypes, it either requires some external dependecies
+or writing a bit of code. One the proposed solution for this is modular
+implicits. In the post I will argue that while modular implicit would help with
+printing a lot, they are not sufficient on their own, and it would be possible
+to improve the printing experience a lot without them.</p>
+<h2 id="modular-implicits">Modular implicits</h2>
+<p>Modular implicits are a very powerful feature which requires a lot of research
+and implementation work, and are not going to be available for a very long time.
+It would allow us to do the following :</p>
+<pre><code class="language-ocaml">module type Printable = sig
+  type t
+
+  val print : t -&gt; out_channel -&gt; unit
+end
+
+(* Such constraints are not possible in OCaml for now *)
+let print (M : Printable) (v : M.t) out_channel =
+  M.print v out_channel
+
+let () =
+  (* Here is the implicit part : you do not need to give the module [Int], it is
+     selected automatically because it fits the signature *)
+  print 123
+</code></pre>
+<h2 id="modular-implicits-are-not-enough">Modular implicits are not enough</h2>
+<p>This is very cool, but having modular implicits on its own would not solve the
+printing issue. You would also need <code>Int</code> to be printable, and currently it is
+and no module in the Stdlib is.</p>
+<p>There are obviously functions to print many types, but none of them are in their
+respective modules. You have <code>output_int</code>, <code>Format.pp_print_int</code>, but not
+<code>Int.print</code>. More complex types like <code>'a list</code> do not have such functions at all.
+This may seems like a detail because adding such functions would be very easy
+compared to implementing modular implicits, but I believe it is not a detail but
+a low-hanging fruit.</p>
+<p>If such functions existed in every module in the Stdlib, we could say to
+beginners something like :</p>
+<ul>
+<li>To print a value of type <code>M.t</code>, you do <code>M.print</code>.
+That would be a whole lot better than to tell them that they have to handle it
+themselves. And I would even go as far as to say that it is just as good as
+modular <strong>explicits</strong>, that is a version of the above code where you have to specify
+the module : <code>print Int 123</code> is not that different from <code>Int.print 123</code>.
+</li>
+</ul>
+<p>That is to say, modular implicits give inference for printing, which is very
+good, but a lot of langages that have a typeclass-like thing for printing do not
+have very good type inference, and (almost) catching up with them would only
+require small changes to the Stdlib.</p>
+<p>In c++, you could write :</p>
+<pre><code class="language-c++">int x = 123;
+cout &lt;&lt; x; 
+</code></pre>
+<p>and in Ocaml with the changes I talk about that would be</p>
+<pre><code class="language-ocaml">let x = 123 in
+Int.print x
+</code></pre>
+<p>The explicit typing is done the same number of times, and I think they are both
+equally reasonable ways to print.</p>
+<p>There is also the case of types that have an abstract parameter like <code>'a list</code>.
+In that case, you need an extra argument to the <code>print</code> function. The comparison
+then becomes</p>
+<pre><code class="language-c++">vector&lt;int&gt; arr = {1; 2 ;3};
+cout &lt;&lt; arr;
+</code></pre>
+<pre><code class="language-ocaml">let arr = [|1; 2; 3|] in
+Array.print Int.print arr
+</code></pre>
+<p>Here ocaml is only slightly worse because you need to repeat <code>print</code>, but it is
+still very much manageable, and it would be possible to write a small syntax
+extension that removes this annoyance. It could look like that, and it does not
+need to part of the stdlib.</p>
+<pre><code class="language-ocaml">let arr = [|1; 2; 3|] in
+print_endline {%fmt|arr = %{arr : Array[Int]} |}
+</code></pre>
+<p>One thing that OCaml would still be bad at is printing value with abstract types.
+In C++ you could do :</p>
+<pre><code class="language-c++">template&lt;class T&gt;
+void f( vector&lt;T&gt; arr) {
+  cout &lt;&lt; arr;
+  ...
+}
+</code></pre>
+<p>whereas in ocaml, you would need to do the following :</p>
+<pre><code class="language-ocaml">let f (arr : 'a array) =
+  Array.print ???.print arr
+</code></pre>
+<p>Which is not possible.</p>
+<p>But I still think that being able to say &quot;printing is pain when you have
+abstract type&quot; is ten times better than having to admit that printing is a pain
+most of the time.</p>
+<h2 id="the-standard-issue">The standard issue</h2>
+<p>While adding the printing functions would not be very hard, deciding exactly
+what to add may be harder :
+What is the type of the <code>print</code> function ? What exactly does it print ?
+This can be quite hard to decide, as it is a design question that does not have
+a unique answer, but I think this discussion is worthwile. I will try to propose
+design ideas in the future.</p>
+
+        </article>
+    </div>
+
+        
+        
+        
+        </div>
+        <footer>
+            
+        </footer>
+    </body>
+</html>
