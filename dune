@@ -7,19 +7,15 @@
   (run sass style.sass style.css)))
 
 (rule
- (targets fr.tex en.tex resume_en.html index.html 404.html)
+ (targets fr.tex en.tex resume.html index.html 404.html software.html)
  (alias site)
  (deps
   ../src/main.exe
-  (source_tree .))
+  Gemfile
+  Gemfile.lock
+  _config.yml)
  (action
   (run ../src/main.exe)))
-
-(rule
- (aliases site script)
- (deps ../src/jsoo/blog_loader.bc.js)
- (action
-  (copy ../src/jsoo/blog_loader.bc.js blog_loader.js)))
 
 (rule
  (aliases site blog)

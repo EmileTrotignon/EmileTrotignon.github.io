@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><title>Émile Trotignon's personal page</title><meta charset="utf-8"/><link rel="stylesheet" href="/style.css"/><link rel="stylesheet" href="/style.css"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;display=swap"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans&amp;display=swap"/><script src="/js/rhill-voronoi-core.js"></script><script src="https://kit.fontawesome.com/0c027fe19b.js" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.11/paper-full.min.js"></script><script type="text/paperscript" canvas="canvas-1">
+      var voronoi =  new Voronoi();
+      var sites = generateBeeHivePoints(view.size / 75, true);
+      var speeds = generateSpeeds(view.size / 75);
+      console.log(speeds);
+      var forces = generateSpeeds(view.size / 75);
+      var bbox, diagram;
+      var oldSize = view.size;
+      var spotColor = new Color('rgba(240, 84, 76, 0.66)');
+      var mousePos = view.center;
+      var selected = false;
+  
+      onResize();
+  
+      function onMouseDown(event) {
+          sites.push(event.point);
+          renderDiagram();
+      }
+  
+      function onMouseMove(event) {
+          mousePos = event.point;
+          mousePos.speed = new Point(0.0);
+          mousePos.force = new Point(0.0);
+          if (event.count == 0)
+          {
+              sites.push(mousePos);
+              speeds.push(new Point(0,0));
+              forces.push(new Point(0,0));
+          }
+  
+          sites[sites.length - 1] = mousePos;
+          speeds[speeds.length - 1] = new Point(0,0);
+          forces[forces.length - 1] = new Point(0,0);
+      }
+  
+      function moveSites() {
+        for (var i = 0; i < sites.length; i++) {
+          if ((sites[i] + speeds[i]).isInside(new Rectangle(new Point(bbox.xl, bbox.yt), new Point(bbox.xr, bbox.yb))))
+            sites[i] += speeds[i];
+          else
+            speeds[i] *= -1;
+          //sites[i] = moveToRect(sites[i], new Rectangle(new Point(bbox.xl, bbox.yt), new Point(bbox.xr, bbox.yb)));
+          var length = Math.sqrt(speeds[i].x * speeds[i].x + speeds[i].y * speeds[i].y);
+          speeds[i] += forces[i];
+          var new_length = Math.sqrt(speeds[i].x * speeds[i].x + speeds[i].y * speeds[i].y);
+          speeds[i].x = speeds[i].x * length / new_length;
+          speeds[i].y = speeds[i].y * length / new_length; 
+          forces[i] = (Point.random() - new Point(0.5, 0.5)) / 100;
+        }
+      }
+  
+      function moveToRect(point, rect) {
+        point2 = new Point(point);
+        while(!point2.isInside(rect)) {
+          if (point2.x < rect.left)
+            point2.x += rect.width;
+          if (point2.x > rect.right)
+            point2.x -= rect.width;
+          if (point2.y < rect.top)
+            point2.y += rect.height;
+          if (point2.y > rect.bottom)
+            point2.y -= rect.height;
+        }
+        return point2;
+      }
+  
+      function renderDiagram() {
+          project.activeLayer.children = [];
+          moveSites();
+          var diagram = voronoi.compute(sites, bbox);
+          if (diagram) {
+              for (var i = 0, l = sites.length; i < l; i++) {
+                  var cell = diagram.cells[sites[i].voronoiId];
+                  if (cell) {
+                      var halfedges = cell.halfedges,
+                          length = halfedges.length;
+                      if (length > 2) {
+                          var points = [];
+                          for (var j = 0; j < length; j++) {
+                              v = halfedges[j].getEndpoint();
+                              points.push(new Point(v));
+                          }
+                          createPath(points, sites[i]);
+                      }
+                  }
+              }
+          }
+      }
+  
+      function removeSmallBits(path) {
+          var averageLength = path.length / path.segments.length;
+          var min = path.length / 50;
+          for(var i = path.segments.length - 1; i >= 0; i--) {
+              var segment = path.segments[i];
+              var cur = segment.point;
+              var nextSegment = segment.next;
+              var next = nextSegment.point + nextSegment.handleIn;
+              if (cur.getDistance(next) < min) {
+                  segment.remove();
+              }
+          }
+      }
+  
+      function generateBeeHivePoints(size, loose) {
+          var points = [];
+          var col = view.size / size;
+          for(var i = -1; i < size.width + 1; i++) {
+              for(var j = -1; j < size.height + 1; j++) {
+                  var point = new Point(i, j) / new Point(size) * view.size + col / 2;
+                  if(j % 2)
+                      point += new Point(col.width / 2, 0);
+                  if(loose)
+                      point += (col) * Point.random() - col / 4;
+                  points.push(point);
+              }
+          }
+          return points;
+      }
+  
+      function generateSpeeds(size)
+      {
+        var points = [];
+          for(var i = -1; i < size.width + 1; i++) {
+              for(var j = -1; j < size.height + 1; j++) {
+                  var speed = new Point(Math.random()/8, Math.random()/4);
+                  points.push(speed);
+              }
+          }
+          return points;
+      }
+  
+      function createPath(points, center) {
+          var paths = new CompoundPath();
+          if (!selected) {
+              paths.strokeColor = spotColor;
+          } else {
+              paths.fullySelected = selected;
+          }
+          //paths.closed = true;
+  
+          for (var i = 0, l = points.length; i < l; i++) {
+              var point = points[i];
+              var next = points[(i + 1) == points.length ? 0 : i + 1];
+              var prec = points[(i - 1) == 0 ? points.length -1 : i - 1];
+              var vector = (next - point) / 2;
+              var path = new Path.Line(point, next);
+              path.scale(0.66);
+  
+              //var circle = new Path.Circle(point, 1);
+              //circle.fillColor = new Color("white");
+              paths.addChild(path);
+              //paths.addChild(circle);
+          }
+          //removeSmallBits(path);
+  
+          return paths;
+      }
+  
+      function onResize() {
+          var margin = 0;
+          bbox = {
+              xl: margin,
+              xr: view.bounds.width - margin,
+              yt: margin,
+              yb: view.bounds.height - margin
+          };
+          for (var i = 0, l = sites.length; i < l; i++) {
+              sites[i] = sites[i] * view.size / oldSize;
+          }
+          oldSize = view.size;
+      }
+      function onFrame(event) {
+          renderDiagram();
+      }
+      /*function onKeyDown(event) {
+          if (event.key == 'space') {
+              selected = !selected;
+              renderDiagram();
+          }
+      }*/
+      </script></head><body><header><canvas resize="true" id="canvas-1" style="user-select: none;" data-paper-scope="1"></canvas><h1><a href="/">Émile Trotignon</a></h1></header><div id="body"><nav id="sidebar"><section id="navmenu"><a href="/" class="button">Index</a><a href="/software" class="button">Software</a><a href="/resume" class="button">Resume</a><a href="/blog" class="button current" id="blog-navlink">Blog</a></section><section><p><a href="https://github.com/EmileTrotignon"><img src="/icons/github-icon.svg" alt="Github icon" class="icon"/>Github</a></p><p><a href="mailto:emile.trotignon@gmail.com"><span class="icon"><i class="fas fa-envelope fa-lg"></i></span>emile.trotignon@gmail.com</a></p><p>Born July 30th, 1999</p></section></nav><ul id="breadcrumbs"><li><a href="/">~</a></li><li><a href="/blog">blog</a></li><li><a href="/blog/ukraine">ukraine</a></li><li><a href="/blog/ukraine/kyiv.md">kyiv.md</a></li></ul><div id="content-wrapper"><article id="content"><h1 id="kyiv">Kyiv</h1>
+<h2 id="le-train-couchette">Le train couchette</h2>
+<p>Après quelque jours à Lviv, nous prenons le train de nuit pour Kyiv. C'est
+quelque chose que l'on avait déjà fait en 2021, et c'est une expérience très
+réconfortante.</p>
+<p>Notre train part à 23h. Le quai n'est pas surélévé, il faut donc grimper trois
+marches étroites, et y hisser les valises. On est alors acceuilli par un
+interieur fraichement peint en beige. On accede aux cabines par un couloir
+étroit qui longe le coté gauche du train. Comme on est en seconde classe, il y
+quatres lits par cabine, superposés par deux de chaque coté de la fenetre. Il
+est flambant neuf et il y a même des petits voyants lumineux pour indiquer si
+les toilettes sont libres.</p>
+<p><img src="train_exterior.jpg" alt="Vue du train de l'exterieur" /></p>
+<p><img src="train_bedroom.jpg" alt="Chambre train" /></p>
+<p>On fait les lits puis on se couche l'un au dessus de l'autre. Le bruit et le
+roulis du train nous berce doucement, et chaque kachlong est un rail en moins
+qui nous sépare de Kyiv. Nous somme reveillé à 5h30 par l'hote de la rame qui
+ammene du thé à ceux qui en ont commandé. On regarde l'Ukraine défiler pendant
+une demi-heure avant de descendre du train, à Kyiv.</p>
+<h2 id="la-ville">La ville</h2>
+<p><img src="images/kyiv/skyline.jpg" alt="Vue sur de grands immeubles a Kyiv" /></p>
+<p>On retrouve la meme ville qu'en 2021, mais beaucoup de choses ont changées.
+L'immense statue de la mère patrie, installé sur une coline surplombant la ville
+et le fleuve, est en train de se faire retirer le marteau et la faucille qui
+ornait son bouclier. Le symbole sera remplacé par le trident national quelque
+jours plus tard. On ne peut plus visiter le musée à son pied, ce qui est
+vraiment dommage car il contenait en 2021 deux exposition : une sur la guerre
+dans le Donbass depuis 2014, plutot moderne, et une soviétique et tres
+propagandesque sur la Seconde Guerre Mondiale.</p>
+<p><img src="images/kyiv/batkivchshina_maty.jpg" alt="Statue de la mère patrie ornée du trident ukrainien" /></p>
+<p>Il a toutefois un plus petit musée, avec une exposition sur l'invasion de 2022.
+Un certains nombres d'objets récupérés sur des soldats russes morts sont
+présentés. Le passeport d'un tres jeune citoyen de la sois-disante &quot;République
+Populaire de Louhansk&quot; m'a particulièrement marqué. Cet état-poupée séparatiste
+installé par la Russie est connu pour sa mobilisation particulièrement
+agressive. Leur troupes sont connues pour être très mals équipées et entrainée,
+et utilisées comme chair à canon moins couteuse politiquement que des citoyens
+russes.</p>
+<p><img src="images/kyiv/young_lnr_mobik.jpg" alt="Passeport de Vladimir Ovtcharov" /></p>
+<p>Sur la même colline, il y a la Laure des Grottes, un grand monastère ou sont
+enterrés dans des tunnels des corps de saints de l'églises orthodoxe. Les corps
+sont conservés par les mineraux présents naturellement dans les tunnels, et on
+peut même les visiter, ce qu'on avait fait en 2021. Cette fois-ci, nous n'irons
+pas, car la Laure est encore controlée par le patriarcat de Moscou. Nous ne
+sommes pas les seuls de cet avis : lorsque l'on passe devant il y a une petite
+manifestation. Des affiches sont sur le grillage extérieur, et un type
+interpelle les prètres à l'aide d'un haut-parleur.</p>
+<p><img src="images/kyiv/lavra_protest.jpg" alt="Posters contre le patriarcat de Moscou" /></p>
+<p>Pas très loin d'ici, on prend un café dans un hotel celebre pour son
+architecture. La photo que j'ai prise montre en arriere un complexe résidentiel
+monstrueux, une sorte de McBuilding typique du developpement urbain sauvage qui
+a lieu en Ukraine.</p>
+<p><img src="images/kyiv/round_hotel_architecture_old_vs_new.jpg" alt="Hotel" /></p>
+<p>Sur la place de l'indépendance, dites &quot;Maïdan&quot;, lieu de la révolution de la
+dignité de 2014, il y a avait beaucoup d'installation liées a la guerre. Il y
+avait un parterre de petit drapeau, chaque drapeau commemorant un soldat tombé.
+Des hérissons anti-char avaient été peints. Le musée de la méduse et le centre
+commercial sous-terrain Globousse étaient encore présents.</p>
+<p><img src="images/kyiv/maidan_flags.jpg" alt="Parterre de drapeaux" /></p>
+<p><img src="images/kyiv/maidan_painted_hedgehog.jpg" alt="Hérissons anti-chars" /></p>
+<h2 id="les-alertes">Les alertes</h2>
+<p>À Kyiv, on dors chez l'oncle d'Antonina, Serge. Son appartement est dans une
+khruvtchevka, un immeuble de l'époque de Khroutchev. Ce sont des immeubles d'une
+dizaine d'étage, ce qui est peu à Kyiv, mais assez longs. Ils sont souvent dans
+un état plutot mauvais. Chaque appartement dispose d'un voir deux balcons,
+construits ouverts, mais tous munis de fenetres rajoutées par les résidents,
+avec du bois. Ces immeubles ont un ascenceur étroit, qui montre son age par
+toute sortes de bruits menacants. Il y a souvent un jardin à leur pied, muni
+d'une aire de jeux pour enfant. À l'exterieur, des escaliers recouvert d'un toit
+en tole menent à un sous-sol peu engageant, dont le sol est en terre battue.</p>
+<p><img src="images/kyiv/khruvtchevka.jpg" alt="Khruvtchevka typique" /></p>
+<p>Lorsqu'il y a une alerte aérienne, on entend en premier la sonnerie de
+l'application prévue à cet effet, puis des sirènes, les mêmes que les premiers
+mercredis du mois en France. Lors de notre première nuit à Kyiv, Serge nous
+indique qu'il les ignore. On marche quand même cinq minute pour se réfugier dans
+le métro, mais les allées et venues nous donnent l'impression que l'attitude de
+Serge est largement partagée. Il y aura une deuxième alerte dans la même
+journée, que l'on ignorera. Le début d'une sirène ressemble beaucoup au bruit
+d'une voiture qui accelère au loin, et on y devient rapidement sensible.</p>
+<p>Antonina est abonnée à un canal télégram qui donne des informations plus
+précises sur les alertes. La pluspart du temps il s'agit d'un bombardier russe
+capable de lancer des missiles qui à decollé. Il ne lance pas de missile à
+chaque fois, et ces missiles ayant une très grande portée, cela déclenche une
+alerte dans toute l'Ukraine.</p>
+<p>Lors de notre deuxième nuit, on est reveillés à 1h30 par une alerte. Telegram
+indique qu'il s'agit de Shaheds, des drones iraniens, lents et petit, mais ayant
+une grande portée et un cout très faible. On hésite un peu avant de se
+recoucher. Quinze minutes plus tard, on est de nouveau réveillés, cette fois par
+des explosions. Serge ne sort pas de sa chambre, et on convient avec Timothé,
+son fils de 10 ans, de descendre se cacher. On juge le sous-sol trop
+inconfortable et on prend la direction du métro, ce qui était une franchement
+mauvaise idée puisque les explosions continuent pendant notre trajet et qu'on
+apercoit même une sorte de boule de feu traverser l'horizon. On arrive au métro
+ou il y a cette fois beaucoup de monde. Les plus habitués ont des matelas et des
+chaises de camping. On attend une heure et demi la fin de l'alerte sur le quai.</p>
+<p><img src="images/kyiv/subway_airraid.jpg" alt="Métro de Kyiv lors d'une alerte la nuit" /></p>
+<p>On apprendra par la suite que tous les Shaheds ont été abattus, et que les
+débris n'ont touchés personne. C'était la pire nuit à Kyiv depuis deux mois,
+mais ce n'étais rien par rapport au quotidien pendant l'hiver. On nous diras
+aussi que Kyiv est désormais protégées contre les missiles, grace aux defense
+anti-aériennes fournies par l'occident, mais que c'est la seule ville d'Ukraine
+dans ce cas. On prendra aussi l'habitude de descendre au métro lors des alertes
+de Shahed, sans attendre qu'ils soient la.</p>
+<p><img src="images/kyiv/dnipro.jpg" alt="Vue sur le Dnipro et Kyiv" /></p>
+</article></div></div></body></html>
