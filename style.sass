@@ -297,7 +297,7 @@ nav#sidebar
         &:hover
             border-left: 2px var(--fg) solid
     ul
-        padding-left: 1em 
+        padding-left: 1em
         li
             list-style: square inside
 
@@ -329,3 +329,108 @@ img
     display: block
     color: var(--aqua)
     text-align: center
+
+\:root
+    --source-code-comment: var(--gray)
+    --source-code-docstring: var(--green-dim)
+    --source-code-lident: var(--fg1)
+    --source-code-uident: var(--blue)
+    --source-code-literal: var(--yellow)
+    --source-code-keyword: var(--red)
+    --source-code-underscore: var(--fg3)
+    --source-code-operator: var(--purple)
+    --source-code-parens: var(--orange-dim)
+    --source-code-separator: var(--orange-dim)
+
+/* Keywords */
+.AND, .ANDOP, .AS, .ASSERT,
+.BAR, .BEGIN,
+.CLASS, .CONSTRAINT,
+.DO, .DONE, .DOWNTO,
+.ELSE, .END, .EXCEPTION, .EXTERNAL,
+.FOR, .FUN, .FUNCTION, .FUNCTOR,
+.IF, .IN, .INCLUDE, .INHERIT, .INITIALIZER,
+.LAZY, .LESSMINUS, .LET, .LETOP,
+.MATCH, .METHOD, .MINUSGREATER, .MODULE, .MUTABLE,
+.NEW, .NONREC,
+.OBJECT, .OF, .OPEN,
+.PERCENT, .PRIVATE,
+.REC,
+.SEMISEMI, .SIG, .STRUCT,
+.THEN, .TO, .TRY, .TYPE,
+.VAL, .VIRTUAL,
+.WHEN, .WITH, .WHILE
+
+    color: var(--source-code-keyword)
+
+/* Separators */
+.COMMA, .COLON, .COLONGREATER, .SEMI
+    color: var(--source-code-separator)
+
+/* Parens
+ `begin` and `end ` are excluded because `end` is used in other, more 
+ keyword-y contexts*/
+.BARRBRACKET,
+.LBRACE,
+.LBRACELESS,
+.LBRACKET,
+.LBRACKETAT,
+.LBRACKETATAT,
+.LBRACKETATATAT,
+.LBRACKETBAR,
+.LBRACKETGREATER,
+.LBRACKETLESS,
+.LBRACKETPERCENT,
+.LBRACKETPERCENTPERCENT,
+.LPAREN,
+.RBRACE,
+.RBRACKET,
+.RPAREN
+    color: var(--source-code-parens)
+
+/* Prefix operators */
+.ASSERT, .BANG, .PREFIXOP,
+/* Infix operators.
+ A choice had to be made for equal `=` which is both a keyword and an operator.
+ It looked better having it as an operator, because when it is a keyword,
+ there are already loads of keyword around.
+ It would look even nicer if there was a way to distinguish between these
+ two cases.*/
+.INFIXOP0, .INFIXOP1, .INFIXOP2, .INFIXOP3, .INFIXOP4,
+.BARBAR, .PLUS, .STAR, .AMPERAMPER, .AMPERAND, .COLONEQUAL, .GREATER, .LESS,
+.MINUS, .MINUSDOT, .MINUSGREATER, .OR, .PLUSDOT, .PLUSEQ, .EQUAL
+    color: var(--source-code-operator)
+
+/* Upper case ident 
+ `true` and `false` are considered uident here, because you can bind them in a
+ constructor defintion : 
+ ```ocaml
+ type my_bool = 
+ | true of string
+ | false 
+ | Other of int 
+ ``` */
+.UIDENT, .COLONCOLON, .TRUE, .FALSE
+    color: var(--source-code-uident)
+
+/* Lower case idents.
+ Quotes are here because of `type 'a t = 'a list`,
+ and question mark and tildes because of 
+ ```ocaml
+ let f ~a ?b () = Option.map a b
+ ``` */
+.LIDENT, .QUESTION, .QUOTE, .TILDE
+    color: var(--source-code-lident)
+
+/* Litterals */
+.STRING, .CHAR, .INT, .FLOAT, .QUOTED_STRING_EXPR, .QUOTED_STRING_ITEM
+    color: var(--source-code-literal)
+
+.UNDERSCORE
+    color: var(--source-code-underscore)
+
+.DOCSTRING
+    color: var(--source-code-docstring)
+
+.COMMENT
+    color: var(--source-code-comment)
