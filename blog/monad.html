@@ -179,7 +179,7 @@
               renderDiagram();
           }
       }*/
-      </script></head><body><header><canvas resize="true" id="canvas-1" style="user-select: none;" data-paper-scope="1"></canvas><h1><a href="/">Émile Trotignon</a></h1></header><div id="body"><nav id="sidebar"><section id="navmenu"><a href="/" class="button">Index</a><a href="/software" class="button">Software</a><a href="/resume" class="button">Resume</a><a href="/blog" class="button current" id="blog-navlink">Blog</a></section><section><p><a href="https://github.com/EmileTrotignon"><img src="/icons/github-icon.svg" alt="Github icon" class="icon"/>Github</a></p><p><a href="mailto:emile.trotignon@gmail.com"><span class="icon"><i class="fas fa-envelope fa-lg"></i></span>emile.trotignon@gmail.com</a></p><p>Born July 30th, 1999</p></section></nav><ul id="breadcrumbs"><li><a href="/">~</a></li><li><a href="/blog">blog</a></li><li><a href="/blog/monad.md">monad.md</a></li></ul><article id="content"><h1 id="monad">Monad</h1>
+      </script></head><body><header><canvas resize="true" id="canvas-1" style="user-select: none;" data-paper-scope="1"></canvas><h1><a href="/">Émile Trotignon</a></h1></header><div id="body"><nav id="sidebar"><section id="navmenu"><a href="/" class="button">Index</a><a href="/software" class="button">Software</a><a href="/resume" class="button">Resume</a><a href="/blog" class="button current" id="blog-navlink">Blog</a></section><section><p><a href="https://github.com/EmileTrotignon"><img src="/icons/github-icon.svg" alt="Github icon" class="icon"/>Github</a></p><p><a href="mailto:emile.trotignon@gmail.com"><span class="icon"><i class="fas fa-envelope fa-lg"></i></span>emile.trotignon@gmail.com</a></p><p>Born July 30th, 1999</p></section></nav><ul id="breadcrumbs"><li><a href="/">~</a></li><li><a href="/blog">blog</a></li><li><a href="/blog/monad.md">monad.md</a></li></ul><article id="content"><h1>Monad</h1>
 <p>A monad in OCaml is a module with the following signature :</p>
 <pre><code class="language-ocaml">module type Monad = sig
   type 'a t
@@ -194,16 +194,14 @@ end
 </code></pre>
 <p>In this blog post, I will try to explain two important things around monads :</p>
 <ul>
-<li>Why let operators make sense ?
-</li>
-<li>Why is this signature named, in what sense is it special ?
-</li>
+<li>Why let operators make sense ?</li>
+<li>Why is this signature named, in what sense is it special ?</li>
 </ul>
 <p>What I will not try to explain is how to use them. For that I believe that the
 signature is enough, you just need to play with a concrete monad like <code>Result</code>
 or <code>Lwt</code> for long enough. The explainations bellow are certainly not necessary
 to use monads.</p>
-<h2 id="monad-laws">Monad Laws</h2>
+<h2>Monad Laws</h2>
 <p>For a module to be a monad, it also needs to behave properly, that is according
 to the following laws :</p>
 <pre><code class="language-ocaml">bind (return a) f = f a
@@ -217,7 +215,7 @@ functions are going to behave like you would expect them to. Its not very
 relevant to my explainations bellow.</p>
 <p>Its is still probably worth it as a small exercise to try and prove that it is
 true for common monads with simple implementations like <code>Result</code>.</p>
-<h2 id="let-operators">Let operators</h2>
+<h2>Let operators</h2>
 <p>Let operators are a fancy syntax to use monads. It is quite easy to use them,
 but what is less widely understood is why they make sense.</p>
 <p>To try and get there, we will look at a regular let expression</p>
@@ -258,7 +256,7 @@ let ( let+ ) v f = map f v (* map usually has reverse order arguments. *)
 <p>We can see by using this this that it works very well, but this still does not
 explain everything : why this signature ? What happens if you have <code>map</code> and not
 <code>bind</code> ?</p>
-<h2 id="why-monads">Why monads ?</h2>
+<h2>Why monads ?</h2>
 <p>Here we will explain why the monad signature is important and its meaning.</p>
 <p>First we can notice that <code>map</code> is not strictly necessary because you can
 implement it with <code>bind</code> and <code>return</code> :</p>
@@ -271,10 +269,8 @@ a lot of sense for <code>'a list</code>.</p>
 <p>In the case of a monad we need to look at it as a way to compute an <code>'a</code>. This
 make sense for common monads :</p>
 <ul>
-<li><code>'a Lwt.t</code> is a way to compute an <code>'a</code> asynchronously.
-</li>
-<li><code>'a Option.t</code> is a way to compute an <code>'a</code> that may fail.
-</li>
+<li><code>'a Lwt.t</code> is a way to compute an <code>'a</code> asynchronously.</li>
+<li><code>'a Option.t</code> is a way to compute an <code>'a</code> that may fail.</li>
 </ul>
 <p>It would not make sense to state that an <code>'a Lwt.t</code> contains an <code>'a</code> : it might
 not &quot;contain&quot; it just yet. Likewise for an <code>'a Option.t</code>, there might not be a
@@ -287,38 +283,32 @@ is well known, but <code>bind</code> less so. <code>bind</code> is actually the 
 <code>concat_map : 'a list -&gt; ('a -&gt; 'b list) -&gt; 'b list</code>.</p>
 <p>When we view things this way, <code>map</code>'s arguments are :</p>
 <ul>
-<li><code>'a -&gt; 'b</code> a regular computation that depends on another regular computation
-</li>
-<li><code>'a t</code> a computation of an <code>'a</code> that returned multiple results
-</li>
+<li><code>'a -&gt; 'b</code> a regular computation that depends on another regular computation</li>
+<li><code>'a t</code> a computation of an <code>'a</code> that returned multiple results</li>
 </ul>
 <p>So <code>map</code> itself is a way to make a regular computation that depends on a
 non-deterministic computation. The final result is non-deterministic, as it
 should be.</p>
 <p>Lets look at bind :</p>
 <ul>
-<li><code>'a t</code> is a non-deterministic computation.
-</li>
-<li><code>'a -&gt; 'b t</code> is a non-deterministic computation that depends on a regular one.
-</li>
+<li><code>'a t</code> is a non-deterministic computation.</li>
+<li><code>'a -&gt; 'b t</code> is a non-deterministic computation that depends on a regular one.</li>
 </ul>
 <p>So <code>bind</code> is a way to make a non-deterministic computation that depends on
 another non-deterministic computation.</p>
 <p>Understanding <code>return</code> is even simpler : it turns a regular compution into
 a non-determistic one. It is a bit artificial : it is going to give only
 one possible result.</p>
-<h2 id="example-sudoku">Example : Sudoku</h2>
+<h2>Example : Sudoku</h2>
 <p>Lets look a real use-case of non-deterministic computation : solving a sudoku.
 When you solve a sudoku, you have a set legals digits to put in each cells, but
 choosing the wrong one may block you later.</p>
 <p>We are going to place ourselves in a very abstract sudoku :</p>
 <ul>
-<li>Empty cells are represented by ints from <code>0</code> to <code>n_cells</code>.
-</li>
+<li>Empty cells are represented by ints from <code>0</code> to <code>n_cells</code>.</li>
 <li>A digit <code>i</code> in cell <code>cell</code> is legal if <code>legal_move ~cells ~cell i</code> returns
 true. <code>cells</code> is a list of size <code>i - 1</code> with the digits put in the previous
-cells. This <code>legal</code> function exists for one instance of a sudoku problem.
-</li>
+cells. This <code>legal</code> function exists for one instance of a sudoku problem.</li>
 </ul>
 <p>We can solve the sudoku with the following code :</p>
 <pre><code class="language-ocaml">let digits = [1; 2; 3; 4; 5; 6; 7; 8; 9] in
@@ -362,7 +352,7 @@ computation that depends on it : we just return the list of cells afterwards.</p
 This syntax used to be very common in the OCaml ecosystem before let operators
 were available. They also try and make the non-determinism usable in reality,
 by caring about performance.</p>
-<h2 id="what-if-you-do-not-have-bind">What if you do not have bind ?</h2>
+<h2>What if you do not have bind ?</h2>
 <p>The following signature is called a functor :</p>
 <pre><code class="language-ocaml">module type Functor = sig
   type 'a t
@@ -406,7 +396,7 @@ restricts possible grammars to context-free ones.</p>
 <p>To be more precise, <code>Cmdliner</code> is actually an applicative functor, which is
 slightly more powerful than the presented functor, but still does not have bind,
 and also only allows to parse context-free grammar.</p>
-<h2 id="conclusion">Conclusion</h2>
+<h2>Conclusion</h2>
 <p>To sum things up, a monad is in interface that provide a way to make special
 computations that can depend on other special computations of the same kind.
 Computations are nicely expressed by let-bindings instead of anonymous

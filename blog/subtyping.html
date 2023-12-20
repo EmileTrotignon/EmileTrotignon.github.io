@@ -179,26 +179,22 @@
               renderDiagram();
           }
       }*/
-      </script></head><body><header><canvas resize="true" id="canvas-1" style="user-select: none;" data-paper-scope="1"></canvas><h1><a href="/">Émile Trotignon</a></h1></header><div id="body"><nav id="sidebar"><section id="navmenu"><a href="/" class="button">Index</a><a href="/software" class="button">Software</a><a href="/resume" class="button">Resume</a><a href="/blog" class="button current" id="blog-navlink">Blog</a></section><section><p><a href="https://github.com/EmileTrotignon"><img src="/icons/github-icon.svg" alt="Github icon" class="icon"/>Github</a></p><p><a href="mailto:emile.trotignon@gmail.com"><span class="icon"><i class="fas fa-envelope fa-lg"></i></span>emile.trotignon@gmail.com</a></p><p>Born July 30th, 1999</p></section></nav><ul id="breadcrumbs"><li><a href="/">~</a></li><li><a href="/blog">blog</a></li><li><a href="/blog/subtyping.md">subtyping.md</a></li></ul><article id="content"><h1 id="subtyping-and-variance">Subtyping and Variance</h1>
+      </script></head><body><header><canvas resize="true" id="canvas-1" style="user-select: none;" data-paper-scope="1"></canvas><h1><a href="/">Émile Trotignon</a></h1></header><div id="body"><nav id="sidebar"><section id="navmenu"><a href="/" class="button">Index</a><a href="/software" class="button">Software</a><a href="/resume" class="button">Resume</a><a href="/blog" class="button current" id="blog-navlink">Blog</a></section><section><p><a href="https://github.com/EmileTrotignon"><img src="/icons/github-icon.svg" alt="Github icon" class="icon"/>Github</a></p><p><a href="mailto:emile.trotignon@gmail.com"><span class="icon"><i class="fas fa-envelope fa-lg"></i></span>emile.trotignon@gmail.com</a></p><p>Born July 30th, 1999</p></section></nav><ul id="breadcrumbs"><li><a href="/">~</a></li><li><a href="/blog">blog</a></li><li><a href="/blog/subtyping.md">subtyping.md</a></li></ul><article id="content"><h1>Subtyping and Variance</h1>
 <p>Subtyping is a powerful concept that feels very intuitive but has weird
 consequences. These consequences are often referred to by the complicated terms
 &quot;covariance&quot; and &quot;contravariance&quot;. I will explain what this means bellow.</p>
-<h2 id="introduction-ocaml-notations">Introduction : OCaml notations</h2>
+<h2>Introduction : OCaml notations</h2>
 <p>I will use notations from the OCaml langage. You may skip this section if you
 are familiar with it.</p>
 <ul>
-<li><code>val v : t</code> means that there is value <code>v</code> that has type <code>t</code>.
-</li>
+<li><code>val v : t</code> means that there is value <code>v</code> that has type <code>t</code>.</li>
 <li><code>a -&gt; b</code> is the type of functions that take an argument of type <code>a</code> and return
-a value of type <code>b</code>.
-</li>
-<li><code>f a</code> is the application of the function <code>f</code> to the value <code>a</code>.
-</li>
+a value of type <code>b</code>.</li>
+<li><code>f a</code> is the application of the function <code>f</code> to the value <code>a</code>.</li>
 <li>A type <code>'a t</code> has a parameter <code>'a</code>. You can put any type in it, for instance
-<code>int t</code> or <code>string t</code> are both valid types.
-</li>
+<code>int t</code> or <code>string t</code> are both valid types.</li>
 </ul>
-<h2 id="basics">Basics</h2>
+<h2>Basics</h2>
 <p>&quot;<code>A</code> is a subtype of <code>B</code>&quot; is written <code>A &lt; B</code> and means that where we need a
 value of type <code>B</code>, providing a value of type <code>A</code> instead is fine.</p>
 <p>In OOP vocabulary, we would say that <code>A</code> inherits <code>B</code>, but there are other kinds
@@ -215,7 +211,7 @@ val v : square
 <p>Then <code>f v</code> is well-typed.
 Depending on the language, some kind of explicit instruction to consider that
 <code>v</code> is of type <code>Rectangle</code> may be needed.</p>
-<h2 id="covariance">Covariance</h2>
+<h2>Covariance</h2>
 <p>Lets imagine that we have the following values :</p>
 <pre><code class="language-ocaml">val high1 : (int -&gt; square) -&gt; square
 
@@ -245,7 +241,7 @@ ill-typed.</p>
 &quot;varies&quot; in the same direction as <code>a</code>.</p>
 <p>Here, variation means &quot;accepting a sub- or super-type&quot;, and the direction is
 whether we are talking a sub-type or a super-type.</p>
-<h2 id="contravariance">Contravariance</h2>
+<h2>Contravariance</h2>
 <p>Lets imagine that we have the following values :</p>
 <pre><code class="language-ocaml">val high1 : (square -&gt; int) -&gt; int
 
@@ -267,7 +263,7 @@ type <code>(square -&gt; int)</code> can be called value of type <code>(rectangl
 <p>We call this situation contravariance.</p>
 <p>More precisely, the function type <code>a -&gt; b</code> is contravariant with <code>b</code>, because it
 &quot;varies&quot; in the opposite direction as <code>b</code>.</p>
-<h2 id="invariance">Invariance</h2>
+<h2>Invariance</h2>
 <p>This time, we will ask the question of the type <code>ref</code>.</p>
 <p>In OCaml, <code>t ref</code> designated a mutable variable of type <code>t</code>.</p>
 <p>In essence, a mutable value is a pair of a setter function and a getter
@@ -316,7 +312,7 @@ We say that the type <code>a ref</code> type is invariant with <code>a</code>, b
 <p>Notice that any type <code>'a t</code> that contains a mutable field of type <code>'a</code> is going
 to be invariant for the same reason. This is especially important for the type
 <code>array</code>.</p>
-<h2 id="java">Java</h2>
+<h2>Java</h2>
 <p>In this section, I will start rambling about how aweful Java is.</p>
 <p>Java consider its array type to be covariant. We saw earlier that it is in
 fact invariant. This means that some typing errors will manifest themselves at
