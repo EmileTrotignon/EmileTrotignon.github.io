@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><title>Émile Trotignon's personal page</title><meta charset="utf-8"/><link rel="stylesheet" href="/style.css"/><link rel="stylesheet" href="/style.css"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;display=swap"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans&amp;display=swap"/><script src="/js/rhill-voronoi-core.js"></script><script src="https://kit.fontawesome.com/0c027fe19b.js" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.11/paper-full.min.js"></script><script type="text/paperscript" canvas="canvas-1">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><title>Émile Trotignon's personal page</title><meta charset="utf-8"/><link rel="stylesheet" href="/style.css"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;display=swap"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans&amp;display=swap"/><script src="/js/rhill-voronoi-core.js"></script><script src="https://kit.fontawesome.com/0c027fe19b.js" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.11/paper-full.min.js"></script><script type="text/paperscript" canvas="canvas-1">
       var voronoi =  new Voronoi();
       var sites = generateBeeHivePoints(view.size / 75, true);
       var speeds = generateSpeeds(view.size / 75);
@@ -10,14 +10,14 @@
       var spotColor = new Color('rgba(240, 84, 76, 0.66)');
       var mousePos = view.center;
       var selected = false;
-  
+
       onResize();
-  
+
       function onMouseDown(event) {
           sites.push(event.point);
           renderDiagram();
       }
-  
+
       function onMouseMove(event) {
           mousePos = event.point;
           mousePos.speed = new Point(0.0);
@@ -28,12 +28,12 @@
               speeds.push(new Point(0,0));
               forces.push(new Point(0,0));
           }
-  
+
           sites[sites.length - 1] = mousePos;
           speeds[speeds.length - 1] = new Point(0,0);
           forces[forces.length - 1] = new Point(0,0);
       }
-  
+
       function moveSites() {
         for (var i = 0; i < sites.length; i++) {
           if ((sites[i] + speeds[i]).isInside(new Rectangle(new Point(bbox.xl, bbox.yt), new Point(bbox.xr, bbox.yb))))
@@ -45,11 +45,11 @@
           speeds[i] += forces[i];
           var new_length = Math.sqrt(speeds[i].x * speeds[i].x + speeds[i].y * speeds[i].y);
           speeds[i].x = speeds[i].x * length / new_length;
-          speeds[i].y = speeds[i].y * length / new_length; 
+          speeds[i].y = speeds[i].y * length / new_length;
           forces[i] = (Point.random() - new Point(0.5, 0.5)) / 100;
         }
       }
-  
+
       function moveToRect(point, rect) {
         point2 = new Point(point);
         while(!point2.isInside(rect)) {
@@ -64,7 +64,7 @@
         }
         return point2;
       }
-  
+
       function renderDiagram() {
           project.activeLayer.children = [];
           moveSites();
@@ -87,7 +87,7 @@
               }
           }
       }
-  
+
       function removeSmallBits(path) {
           var averageLength = path.length / path.segments.length;
           var min = path.length / 50;
@@ -101,7 +101,7 @@
               }
           }
       }
-  
+
       function generateBeeHivePoints(size, loose) {
           var points = [];
           var col = view.size / size;
@@ -117,7 +117,7 @@
           }
           return points;
       }
-  
+
       function generateSpeeds(size)
       {
         var points = [];
@@ -129,7 +129,7 @@
           }
           return points;
       }
-  
+
       function createPath(points, center) {
           var paths = new CompoundPath();
           if (!selected) {
@@ -138,7 +138,7 @@
               paths.fullySelected = selected;
           }
           //paths.closed = true;
-  
+
           for (var i = 0, l = points.length; i < l; i++) {
               var point = points[i];
               var next = points[(i + 1) == points.length ? 0 : i + 1];
@@ -146,17 +146,17 @@
               var vector = (next - point) / 2;
               var path = new Path.Line(point, next);
               path.scale(0.66);
-  
+
               //var circle = new Path.Circle(point, 1);
               //circle.fillColor = new Color("white");
               paths.addChild(path);
               //paths.addChild(circle);
           }
           //removeSmallBits(path);
-  
+
           return paths;
       }
-  
+
       function onResize() {
           var margin = 0;
           bbox = {
@@ -179,9 +179,9 @@
               renderDiagram();
           }
       }*/
-      </script></head><body><header><canvas resize="true" id="canvas-1" style="user-select: none;" data-paper-scope="1"></canvas><h1><a href="/">Émile Trotignon</a></h1></header><div id="body"><nav id="sidebar"><section id="navmenu"><a href="/" class="button current">Index</a><a href="/software" class="button">Software</a><a href="/resume" class="button">Resume</a><a href="/blog" class="button" id="blog-navlink">Blog</a></section><section><p><a href="https://github.com/EmileTrotignon"><img src="/icons/github-icon.svg" alt="Github icon" class="icon"/>Github</a></p><p><a href="mailto:emile.trotignon@gmail.com"><span class="icon"><i class="fas fa-envelope fa-lg"></i></span>emile.trotignon@gmail.com</a></p><p>Born July 30th, 1999</p></section></nav><ul id="breadcrumbs"><li><a href="/">~</a></li></ul><div id="content-wrapper"><article id="content"><section><p>Welcome to my home page</p><p>I used to be a student in computer science at ENS Paris-Saclay, nowadays I am a dev at Tarides,
+      </script></head><body><header><canvas resize="true" id="canvas-1" style="user-select: none;" data-paper-scope="1"></canvas><h1><a href="/">Émile Trotignon</a></h1></header><div id="body"><nav id="sidebar"><section id="navmenu"><a href="/" class="button current">Index</a><a href="/software" class="button">Software</a><a href="/resume" class="button">Resume</a><a href="/blog" class="button" id="blog-navlink">Blog</a></section><section><p><a href="https://github.com/EmileTrotignon"><img src="/icons/github-icon.svg" alt="Github icon" class="icon"/>Github</a></p><p><a href="mailto:emile.trotignon@gmail.com"><span class="icon"><i class="fas fa-envelope fa-lg"></i></span>emile.trotignon@gmail.com</a></p><p>Born July 30th, 1999</p></section></nav><ul id="breadcrumbs"><li><a href="/">~</a></li></ul><article id="content"><section><p>Welcome to my home page</p><p>I used to be a student in computer science at ENS Paris-Saclay, nowadays I am a dev at Tarides,
 were I work on tools for ocaml like odoc and ocamlformat.
-    
+
 I am very interested in the OCaml language and programming languages in general.
-You can check some of my projects out on my &lt;a href=&quot;https://github.com/EmileTrotignon&quot;&gt;github&lt;/a&gt;,
-and my resume on this website.</p></section></article></div></div><script src="/highlight.js"></script></body></html>
+You can check some of my projects out on my <a href="https://github.com/EmileTrotignon">github</a>,
+and my resume on this website.</p></section></article></div><script src="/highlight.js"></script></body></html>

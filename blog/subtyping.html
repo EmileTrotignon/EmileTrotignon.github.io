@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><title>Émile Trotignon's personal page</title><meta charset="utf-8"/><link rel="stylesheet" href="/style.css"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;display=swap"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans&amp;display=swap"/><script src="/js/rhill-voronoi-core.js"></script><script src="https://kit.fontawesome.com/0c027fe19b.js" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.11/paper-full.min.js"></script><script type="text/paperscript" canvas="canvas-1">
+      var voronoi =  new Voronoi();
+      var sites = generateBeeHivePoints(view.size / 75, true);
+      var speeds = generateSpeeds(view.size / 75);
+      console.log(speeds);
+      var forces = generateSpeeds(view.size / 75);
+      var bbox, diagram;
+      var oldSize = view.size;
+      var spotColor = new Color('rgba(240, 84, 76, 0.66)');
+      var mousePos = view.center;
+      var selected = false;
+
+      onResize();
+
+      function onMouseDown(event) {
+          sites.push(event.point);
+          renderDiagram();
+      }
+
+      function onMouseMove(event) {
+          mousePos = event.point;
+          mousePos.speed = new Point(0.0);
+          mousePos.force = new Point(0.0);
+          if (event.count == 0)
+          {
+              sites.push(mousePos);
+              speeds.push(new Point(0,0));
+              forces.push(new Point(0,0));
+          }
+
+          sites[sites.length - 1] = mousePos;
+          speeds[speeds.length - 1] = new Point(0,0);
+          forces[forces.length - 1] = new Point(0,0);
+      }
+
+      function moveSites() {
+        for (var i = 0; i < sites.length; i++) {
+          if ((sites[i] + speeds[i]).isInside(new Rectangle(new Point(bbox.xl, bbox.yt), new Point(bbox.xr, bbox.yb))))
+            sites[i] += speeds[i];
+          else
+            speeds[i] *= -1;
+          //sites[i] = moveToRect(sites[i], new Rectangle(new Point(bbox.xl, bbox.yt), new Point(bbox.xr, bbox.yb)));
+          var length = Math.sqrt(speeds[i].x * speeds[i].x + speeds[i].y * speeds[i].y);
+          speeds[i] += forces[i];
+          var new_length = Math.sqrt(speeds[i].x * speeds[i].x + speeds[i].y * speeds[i].y);
+          speeds[i].x = speeds[i].x * length / new_length;
+          speeds[i].y = speeds[i].y * length / new_length;
+          forces[i] = (Point.random() - new Point(0.5, 0.5)) / 100;
+        }
+      }
+
+      function moveToRect(point, rect) {
+        point2 = new Point(point);
+        while(!point2.isInside(rect)) {
+          if (point2.x < rect.left)
+            point2.x += rect.width;
+          if (point2.x > rect.right)
+            point2.x -= rect.width;
+          if (point2.y < rect.top)
+            point2.y += rect.height;
+          if (point2.y > rect.bottom)
+            point2.y -= rect.height;
+        }
+        return point2;
+      }
+
+      function renderDiagram() {
+          project.activeLayer.children = [];
+          moveSites();
+          var diagram = voronoi.compute(sites, bbox);
+          if (diagram) {
+              for (var i = 0, l = sites.length; i < l; i++) {
+                  var cell = diagram.cells[sites[i].voronoiId];
+                  if (cell) {
+                      var halfedges = cell.halfedges,
+                          length = halfedges.length;
+                      if (length > 2) {
+                          var points = [];
+                          for (var j = 0; j < length; j++) {
+                              v = halfedges[j].getEndpoint();
+                              points.push(new Point(v));
+                          }
+                          createPath(points, sites[i]);
+                      }
+                  }
+              }
+          }
+      }
+
+      function removeSmallBits(path) {
+          var averageLength = path.length / path.segments.length;
+          var min = path.length / 50;
+          for(var i = path.segments.length - 1; i >= 0; i--) {
+              var segment = path.segments[i];
+              var cur = segment.point;
+              var nextSegment = segment.next;
+              var next = nextSegment.point + nextSegment.handleIn;
+              if (cur.getDistance(next) < min) {
+                  segment.remove();
+              }
+          }
+      }
+
+      function generateBeeHivePoints(size, loose) {
+          var points = [];
+          var col = view.size / size;
+          for(var i = -1; i < size.width + 1; i++) {
+              for(var j = -1; j < size.height + 1; j++) {
+                  var point = new Point(i, j) / new Point(size) * view.size + col / 2;
+                  if(j % 2)
+                      point += new Point(col.width / 2, 0);
+                  if(loose)
+                      point += (col) * Point.random() - col / 4;
+                  points.push(point);
+              }
+          }
+          return points;
+      }
+
+      function generateSpeeds(size)
+      {
+        var points = [];
+          for(var i = -1; i < size.width + 1; i++) {
+              for(var j = -1; j < size.height + 1; j++) {
+                  var speed = new Point(Math.random()/8, Math.random()/4);
+                  points.push(speed);
+              }
+          }
+          return points;
+      }
+
+      function createPath(points, center) {
+          var paths = new CompoundPath();
+          if (!selected) {
+              paths.strokeColor = spotColor;
+          } else {
+              paths.fullySelected = selected;
+          }
+          //paths.closed = true;
+
+          for (var i = 0, l = points.length; i < l; i++) {
+              var point = points[i];
+              var next = points[(i + 1) == points.length ? 0 : i + 1];
+              var prec = points[(i - 1) == 0 ? points.length -1 : i - 1];
+              var vector = (next - point) / 2;
+              var path = new Path.Line(point, next);
+              path.scale(0.66);
+
+              //var circle = new Path.Circle(point, 1);
+              //circle.fillColor = new Color("white");
+              paths.addChild(path);
+              //paths.addChild(circle);
+          }
+          //removeSmallBits(path);
+
+          return paths;
+      }
+
+      function onResize() {
+          var margin = 0;
+          bbox = {
+              xl: margin,
+              xr: view.bounds.width - margin,
+              yt: margin,
+              yb: view.bounds.height - margin
+          };
+          for (var i = 0, l = sites.length; i < l; i++) {
+              sites[i] = sites[i] * view.size / oldSize;
+          }
+          oldSize = view.size;
+      }
+      function onFrame(event) {
+          renderDiagram();
+      }
+      /*function onKeyDown(event) {
+          if (event.key == 'space') {
+              selected = !selected;
+              renderDiagram();
+          }
+      }*/
+      </script></head><body><header><canvas resize="true" id="canvas-1" style="user-select: none;" data-paper-scope="1"></canvas><h1><a href="/">Émile Trotignon</a></h1></header><div id="body"><nav id="sidebar"><section id="navmenu"><a href="/" class="button">Index</a><a href="/software" class="button">Software</a><a href="/resume" class="button">Resume</a><a href="/blog" class="button current" id="blog-navlink">Blog</a></section><section><p><a href="https://github.com/EmileTrotignon"><img src="/icons/github-icon.svg" alt="Github icon" class="icon"/>Github</a></p><p><a href="mailto:emile.trotignon@gmail.com"><span class="icon"><i class="fas fa-envelope fa-lg"></i></span>emile.trotignon@gmail.com</a></p><p>Born July 30th, 1999</p></section></nav><ul id="breadcrumbs"><li><a href="/">~</a></li><li><a href="/blog">blog</a></li><li><a href="/blog/subtyping.md">subtyping.md</a></li></ul><article id="content"><h1 id="subtyping-and-variance">Subtyping and Variance</h1>
+<p>Subtyping is a powerful concept that feels very intuitive but has weird
+consequences. These consequences are often referred to by the complicated terms
+&quot;covariance&quot; and &quot;contravariance&quot;. I will explain what this means bellow.</p>
+<h2 id="introduction-ocaml-notations">Introduction : OCaml notations</h2>
+<p>I will use notations from the OCaml langage. You may skip this section if you
+are familiar with it.</p>
+<ul>
+<li><code>val v : t</code> means that there is value <code>v</code> that has type <code>t</code>.
+</li>
+<li><code>a -&gt; b</code> is the type of functions that take an argument of type <code>a</code> and return
+a value of type <code>b</code>.
+</li>
+<li><code>f a</code> is the application of the function <code>f</code> to the value <code>a</code>.
+</li>
+<li>A type <code>'a t</code> has a parameter <code>'a</code>. You can put any type in it, for instance
+<code>int t</code> or <code>string t</code> are both valid types.
+</li>
+</ul>
+<h2 id="basics">Basics</h2>
+<p>&quot;<code>A</code> is a subtype of <code>B</code>&quot; is written <code>A &lt; B</code> and means that where we need a
+value of type <code>B</code>, providing a value of type <code>A</code> instead is fine.</p>
+<p>In OOP vocabulary, we would say that <code>A</code> inherits <code>B</code>, but there are other kinds
+of subtyping than OOP-style inheritance : in OCaml, subtyping shows up with
+classes but also polymorphic variants.</p>
+<p>If <code>A &lt; B</code>, then a value of type <code>A</code> can be considered to be a value of type <code>B</code>.</p>
+<p>Let us consider the example of the types <code>square</code> and <code>rectangle</code>.
+Naturally, we have <code>square &lt; rectangle</code>.
+If you have :</p>
+<pre><code class="language-ocaml">val f : rectangle -&gt; int
+
+val v : square
+</code></pre>
+<p>Then <code>f v</code> is well-typed.
+Depending on the language, some kind of explicit instruction to consider that
+<code>v</code> is of type <code>Rectangle</code> may be needed.</p>
+<h2 id="covariance">Covariance</h2>
+<p>Lets imagine that we have the following values :</p>
+<pre><code class="language-ocaml">val high1 : (int -&gt; square) -&gt; square
+
+val high2 : (int -&gt; rectangle) -&gt; square
+
+val f : int -&gt; square
+
+val g : int -&gt; rectangle
+</code></pre>
+<p>If you are unfamiliar with this notation : <code>high1</code> takes a function as argument,
+this function has to have type <code>int -&gt; square</code>.</p>
+<p>It is very clear that <code>high1 f</code> is well typed, and same is true for <code>high2 g</code>.
+The question is whether <code>high1 g</code> or <code>high2 f</code> are well typed.</p>
+<p>Let's not try to resolve typing2 at first, and just study what will happen if we
+actually run the code.</p>
+<p>If we run <code>high1 g</code>, what will happen is that <code>high1</code> will be allowed to call
+<code>g</code>, and consider its result as a <code>square</code>. However the result of <code>g</code> is not
+necesseraly a <code>square</code>, it may be any <code>rectangle</code>. Therefore <code>high1 g</code> is
+ill-typed.</p>
+<p>If we run <code>high2 f</code>, what will happen is that <code>high2</code> will be allowed to call
+<code>f</code>, and consider its result as a <code>rectangle</code>. Since the results of <code>f</code> are
+<code>square</code> and <code>square &lt; rectangle</code>, this is well-typed.</p>
+<p>This means that if <code>square &lt; rectangle</code>, then
+<code>(int -&gt; square) &lt; (int -&gt; rectangle)</code>.</p>
+<p>We call this situation covariance.</p>
+<p>More precisely, the function type <code>a -&gt; b</code> is covariant with <code>a</code>, because it
+&quot;varies&quot; in the same direction as <code>a</code>.</p>
+<p>Here, variation means &quot;accepting a sub- or super-type&quot;, and the direction is
+whether we are talking a sub-type or a super-type.</p>
+<h2 id="contravariance">Contravariance</h2>
+<p>Lets imagine that we have the following values :</p>
+<pre><code class="language-ocaml">val high1 : (square -&gt; int) -&gt; int
+
+val high2 : (rectangle -&gt; int) -&gt; int
+
+val f : square -&gt; int
+
+val g : rectangle -&gt; int
+</code></pre>
+<p>Once again, it is very clear that <code>high1 f</code> is well typed, and same is true for
+<code>high2 g</code>. The question is whether <code>high1 g</code> or <code>high2 f</code> are well typed.</p>
+<p>When we run <code>high2 f</code>, what will happen is that <code>high2</code> will be allowed to call
+<code>g : square -&gt; int</code> with an argument of type <code>rectangle</code>. This is an error.</p>
+<p>When we run<code>high1 g</code>, what will happen is that <code>high1</code> will be allowed to call
+<code>g : rectangle -&gt; int</code> with an argument of type <code>square</code>. This is fine.</p>
+<p>This means that if <code>square &lt; rectangle</code>, then
+<code>(rectangle -&gt; int) &lt; (square -&gt; int)</code>, because a function with an argument of
+type <code>(square -&gt; int)</code> can be called value of type <code>(rectangle -&gt; int)</code>.</p>
+<p>We call this situation contravariance.</p>
+<p>More precisely, the function type <code>a -&gt; b</code> is contravariant with <code>b</code>, because it
+&quot;varies&quot; in the opposite direction as <code>b</code>.</p>
+<h2 id="invariance">Invariance</h2>
+<p>This time, we will ask the question of the type <code>ref</code>.</p>
+<p>In OCaml, <code>t ref</code> designated a mutable variable of type <code>t</code>.</p>
+<p>In essence, a mutable value is a pair of a setter function and a getter
+function. We can write this the following way :</p>
+<pre><code class="language-ocaml">type 'a ref = {get: unit -&gt; 'a; set: 'a -&gt; unit}
+</code></pre>
+<p>What we want to know is, assuming <code>square &lt; rectangle</code>, can we assert
+<code>square ref &lt; rectangle ref</code> or <code>rectangle ref &lt; square ref</code> ?</p>
+<p>By applying the results of the two above paragraphs, we can already conclude
+that the answer is no. Both assertions are false. Lets show it in a more
+convincing by example.</p>
+<p>Lets assume the following environment :</p>
+<pre><code class="language-ocaml">val new_rectangle : unit -&gt; rectangle
+val new_square : unit -&gt; square
+
+val print_rectangle : rectangle -&gt; unit
+val print_square : square -&gt; unit
+</code></pre>
+<p>We will now write the following function :</p>
+<pre><code class="language-ocaml">let set_to_new r =
+  r.set (new_rectangle ())
+
+let print_rectangle_ref r =
+  print_rectangle (r.get ())
+
+let print_square_ref r =
+  print_square (r.get ())
+</code></pre>
+<p>These functions have the following types :</p>
+<pre><code class="language-ocaml">val set_to_new : rectangle ref -&gt; unit
+
+val print_rectangle_ref : rectangle ref -&gt; unit
+val print_square_ref : square ref -&gt; unit
+</code></pre>
+<p>If we assume that <code>rectangle ref &lt; square ref</code>, then we may pass an argument of
+type <code>rectangle ref</code> to <code>print_square_ref</code>. This will obviously fail, the
+printer for squares cannot print a rectangle. Therefore we do not have
+<code>rectangle ref &lt; square ref</code>.</p>
+<p>If we assume that <code>square ref &lt; rectangle ref</code>, then we may pass an argument of
+type <code>square ref</code> to <code>set_to_new</code>. This break the typing, because then the
+<code>square ref</code> will contain a rectangle obtained from <code>new_rectangle</code> that is not
+necessary a <code>square</code>. Therefore we do not have <code>square ref &lt; rectangle ref</code>.</p>
+<p>We have neither <code>rectangle ref &lt; square ref</code> nor <code>square ref &lt; rectangle ref</code>.
+We say that the type <code>a ref</code> type is invariant with <code>a</code>, because if <code>a</code> &quot;varies&quot;
+(that is accepts a super- or sub-type), then <code>a ref</code> does not.</p>
+<p>Notice that any type <code>'a t</code> that contains a mutable field of type <code>'a</code> is going
+to be invariant for the same reason. This is especially important for the type
+<code>array</code>.</p>
+<h2 id="java">Java</h2>
+<p>In this section, I will start rambling about how aweful Java is.</p>
+<p>Java consider its array type to be covariant. We saw earlier that it is in
+fact invariant. This means that some typing errors will manifest themselves at
+runtime.</p>
+<p>For instance, if you have an array of squares, you may pass it to a function
+expecting an array of rectangle. If the function tries to write a rectangle to
+the array, an exception will be triggered. This is in my opinion a very bad
+situation. Whether a function will write to an array or not is not necessarely
+apparent from its interface, and it must happen quite often that unexpected
+exception are raised, when a more powerful type system would have eliminated
+them.</p>
+<p>I do understand that in a language such as Java, where subtyping is really
+pervasive (that is a mistake by itself in my opinion, but beyond the scope of
+this discussion), you need to be able to use subtyping with arrays. Arrays being
+invariant makes them &quot;incompatible&quot; with subtyping, and this is a definitely an
+issue that needs to be solved. There is however a quite easy way to solve it,
+that does not involve making the type system incomplete.</p>
+<p>Remember that the <code>'a ref</code> was defined as such earlier :</p>
+<pre><code class="language-ocaml">type 'a ref = {get: unit -&gt; 'a; set: 'a -&gt; unit}
+</code></pre>
+<p>Using the same idea we can define the array type as such :</p>
+<pre><code class="language-ocaml">type 'a array = {get: int -&gt; 'a; set: 'a -&gt; int -&gt; unit; length: int}
+</code></pre>
+<p>We need to pass integers for the indexes. Out of bounds errors will be handled
+by an exception.</p>
+<p>With this definition, we once agan see why <code>'a array</code> is invariant in <code>'a</code>.</p>
+<p>However, we can also notice that the type of <code>get</code> is covariant in <code>'a</code>, and the
+type of <code>set</code> is contravariant. An array type deprived of its set function will
+therefore be covariant, and an array type deprived of its get function will be
+contravariant.</p>
+<p>We can write :</p>
+<pre><code class="language-ocaml">type 'a read_only_array = {get: int -&gt; 'a; length: int}
+type 'a write_only_array = {set: 'a -&gt; int -&gt; unit; length: int}
+
+let make_read_only (arr : 'a array) : 'a read_only_array =
+  {get=arr.get; length=arr.length}
+
+let make_write_only (arr : 'a array) : 'a write_only_array =
+  {set=arr.set; length=arr.length}
+</code></pre>
+<p>And then we can convert arrays to either write only or read only, and use them
+as covariant or contravariant types.</p>
+<p>Lets look at at example.</p>
+<pre><code class="language-ocaml">val squares : square array
+val rectangles : rectangle array
+
+let print_rect_array (arr: rectangle read_only_array) : unit =
+  for i=0 to arr.length - 1 do
+    print_rect (arr.get (i))
+  done
+
+let reset_square_array (arr: square write_only_array) : unit =
+  for i=0 to arr.length - 1 do
+    arr.set (new_square ()) i
+  done
+</code></pre>
+<p>Here you can use both functions on both <code>squares</code> and <code>rectangles</code> :</p>
+<pre><code class="language-ocaml">let main () =
+  (* directly well-typed *)
+  print_rect_array (read_only_array rectangles) ;
+  (* well-typed by covariance *)
+  print_rect_array (read_only_array square) ;
+
+  (* directly well-typed *)
+  reset_square_array (write_only_array squares) ;
+  (* well-typed by contravariance *)
+  reset_square_array (write_only_array rectangle)
+</code></pre>
+<p>A more powerful type system would make the calls to <code>write_only_array</code> and
+<code>read_only_array</code> implicit (they would be language construction instead of
+regular functions). This would be very comfortable to use, and I believe this is
+what Java should have done.</p>
+<p>This type system would allow to following syntax :</p>
+<pre><code class="language-ocaml">val squares : square array
+val rectangles : rectangle array
+
+let print_rect_array (read_only arr: rectangle array) : unit =
+  for i=0 to arr.length - 1 do
+    print_rect (arr.get (i))
+  done
+
+let reset_square_array (write_only arr: square array) : unit =
+  for i=0 to arr.length - 1 do
+    arr.set (new_square ()) i
+  done
+
+let main () =
+  (* directly well-typed *)
+  print_rect_array rectangles ;
+  (* well-typed by covariance *)
+  print_rect_array square ;
+
+  (* directly well-typed *)
+  reset_square_array squares ;
+  (* well-typed by contravariance *)
+  reset_square_array rectangle
+</code></pre>
+<p>I am not sure how exactly such a type system would be implemented, but it is
+still funny to notice that there are probably subtyping relationships between
+<code>'a array</code>, <code>'a read_only_array</code> and <code>'a write_only_array</code>. This of course
+depends on the variance of <code>'a</code>.</p>
+</article></div><script src="/highlight.js"></script></body></html>
