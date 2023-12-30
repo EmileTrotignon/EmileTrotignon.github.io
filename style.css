@@ -78,14 +78,14 @@ body {
   background-image: linear-gradient(var(--bg-angle), var(--bg) 0 var(--bg-sep), var(--bg1) var(--bg-sep) 100vh);
   background-attachment: fixed;
   font-family: "Fira Code", sans-serif;
-  font-size: 14px; }
+  font-size: 14px;
+  --bg-sep: calc(30vh - sin(var(--bg-angle)) * 100vw / 2); }
 
 :root {
   --margin-top-body: 1rem; }
 
 #body {
   position: relative;
-  width: fit-content;
   margin: auto;
   display: grid;
   grid-template-rows: calc(16px+0.5rem) 1fr;
