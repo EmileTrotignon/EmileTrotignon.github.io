@@ -19,7 +19,7 @@ end
 </ul>
 <p>What I will not try to explain is how to use them. For that I believe that the
 signature is enough, you just need to play with a concrete monad like <code>Result</code>
-or <code>Lwt</code> for long enough. The explainations bellow are certainly not necessary
+or <code>Lwt</code> for long enough. The explanations below are certainly not necessary
 to use monads.</p>
 <h2>Monad Laws</h2>
 <p>For a module to be a monad, it also needs to behave properly, that is according
@@ -32,7 +32,7 @@ bind (bind m g) h = bind m (fun x -&gt; bind (g x) h)
 </code></pre>
 <p>I believe this is not really important to understand, it just means that the
 functions are going to behave like you would expect them to. Its not very
-relevant to my explainations bellow.</p>
+relevant to my explanations below.</p>
 <p>Its is still probably worth it as a small exercise to try and prove that it is
 true for common monads with simple implementations like <code>Result</code>.</p>
 <h2>Let operators</h2>
@@ -84,10 +84,10 @@ implement it with <code>bind</code> and <code>return</code> :</p>
 </code></pre>
 <p>We will explain later in english what this means.</p>
 <p>To explain what a monad is, we will look at its <code>'a t</code> in a other way. Most of
-the time, we look at a type <code>'a t</code> as a <code>t</code> that contains an <code>'a</code>. That make
+the time, we look at a type <code>'a t</code> as a <code>t</code> that contains an <code>'a</code>. That makes
 a lot of sense for <code>'a list</code>.</p>
 <p>In the case of a monad we need to look at it as a way to compute an <code>'a</code>. This
-make sense for common monads :</p>
+makes sense for common monads :</p>
 <ul>
 <li><code>'a Lwt.t</code> is a way to compute an <code>'a</code> asynchronously.</li>
 <li><code>'a Option.t</code> is a way to compute an <code>'a</code> that may fail.</li>
@@ -121,7 +121,7 @@ a non-determistic one. It is a bit artificial : it is going to give only
 one possible result.</p>
 <h2>Example : Sudoku</h2>
 <p>Lets look a real use-case of non-deterministic computation : solving a sudoku.
-When you solve a sudoku, you have a set legals digits to put in each cells, but
+When you solve a sudoku, you have a set of legal digits to put in each cell, but
 choosing the wrong one may block you later.</p>
 <p>We are going to place ourselves in a very abstract sudoku :</p>
 <ul>
@@ -132,7 +132,7 @@ cells. This <code>legal</code> function exists for one instance of a sudoku prob
 </ul>
 <p>We can solve the sudoku with the following code :</p>
 <pre><code class="language-ocaml">let digits = [1; 2; 3; 4; 5; 6; 7; 8; 9] in
-(* [digit] is one element of [digits], we do not know which one. The bellow code
+(* [digit] is one element of [digits], we do not know which one. The below code
    is going to run once for each possible value of [digit] *)
 let* digit = digits in
 let* cell_0 =
@@ -160,7 +160,7 @@ in
 </code></pre>
 <p>A working version can be found in <a href="sudoku_monad.ml">sudoku_monad.ml</a></p>
 <p>The above code has type <code>int list list</code>, which make sense because a solution is
-a list of digits to put in cells, and there can be multiple solution to a
+a list of digits to put in cells, and there can be multiple solutions to a
 sudoku.</p>
 <p>You can notice that we use <code>let+</code>/<code>map</code> only once. The reason for that is that
 every cell depends on non-deterministic computations : the choice of the digit,
@@ -217,7 +217,7 @@ restricts possible grammars to context-free ones.</p>
 slightly more powerful than the presented functor, but still does not have bind,
 and also only allows to parse context-free grammar.</p>
 <h2>Conclusion</h2>
-<p>To sum things up, a monad is in interface that provide a way to make special
+<p>To sum things up, a monad is in interface that provides a way to make special
 computations that can depend on other special computations of the same kind.
 Computations are nicely expressed by let-bindings instead of anonymous
 functions, and in OCaml we have them even for special computations.</p>
