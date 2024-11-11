@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><title>Émile Trotignon's personal page</title><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="/style.css"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;display=swap"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans&amp;display=swap"/><script src="https://kit.fontawesome.com/0c027fe19b.js" crossorigin="anonymous"></script></head><body><header><canvas resize="true" id="voronoi" style="user-select: none;" data-paper-scope="1"></canvas><h1><a href="/">Émile Trotignon</a></h1></header><div id="body"><nav id="sidebar"><section id="navmenu"><a href="/" class="button">Index</a><a href="/software" class="button">Software</a><a href="/resume" class="button">Resume</a><a href="/blog" class="button current" id="blog-navlink">Blog</a></section><section><p><a href="https://github.com/EmileTrotignon"><img src="/icons/github-icon.svg" alt="Github icon" class="icon"/>Github</a></p><p><a href="mailto:emile.trotignon@gmail.com"><span class="icon"><i class="fas fa-envelope fa-lg"></i></span>emile.trotignon@gmail.com</a></p><p>Born July 30th, 1999</p></section></nav><ul id="breadcrumbs"><li><a href="/">~</a></li><li><a href="/blog">blog</a></li><li><a href="/blog/monad.md">monad.md</a></li></ul><article id="content"><h1>Monad</h1>
-<p>A monad in OCaml is a module with the following signature :</p>
+<p>A monad in OCaml is a module with the following signature:</p>
 <pre><code class="language-ocaml">module type Monad = sig
   type 'a t
 
-  val return : 'a -&gt; 'a t
+  val return&amp;nbsp;: 'a -&gt; 'a t
 
-  val bind : 'a t -&gt; ('a -&gt; 'b t) -&gt; 'b t
+  val bind&amp;nbsp;: 'a t -&gt; ('a -&gt; 'b t) -&gt; 'b t
 
-  val map : ('a -&gt; 'b) -&gt; 'a t -&gt; 'b t
-  (* Different argument order than bind : this is a meaningless convention *)
+  val map&amp;nbsp;: ('a -&gt; 'b) -&gt; 'a t -&gt; 'b t
+  (* Different argument order than bind&amp;nbsp;: this is a meaningless convention *)
 end
 </code></pre>
-<p>In this blog post, I will try to explain two important things around monads :</p>
+<p>In this blog post, I will try to explain two important things around monads:</p>
 <ul>
-<li>Why let operators make sense ?</li>
-<li>Why is this signature named, in what sense is it special ?</li>
+<li>Why let operators make sense?</li>
+<li>Why is this signature named, in what sense is it special?</li>
 </ul>
 <p>What I will not try to explain is how to use them. For that I believe that the
 signature is enough, you just need to play with a concrete monad like <code>Result</code>
@@ -23,48 +23,48 @@ or <code>Lwt</code> for long enough. The explanations below are certainly not ne
 to use monads.</p>
 <h2>Monad Laws</h2>
 <p>For a module to be a monad, it also needs to behave properly, that is according
-to the following laws :</p>
+to the following laws:</p>
 <pre><code class="language-ocaml">bind (return a) f = f a
 
 bind m return = m
 
 bind (bind m g) h = bind m (fun x -&gt; bind (g x) h)
 </code></pre>
-<p>I believe this is not really important to understand, it just means that the
-functions are going to behave like you would expect them to. Its not very
+<p>I believe this is not really important to understand. It just means that the
+functions are going to behave like you would expect them to. It is not very
 relevant to my explanations below.</p>
-<p>Its is still probably worth it as a small exercise to try and prove that it is
+<p>It is still probably worth it as a small exercise to try and prove that it is
 true for common monads with simple implementations like <code>Result</code>.</p>
 <h2>Let operators</h2>
 <p>Let operators are a fancy syntax to use monads. It is quite easy to use them,
 but what is less widely understood is why they make sense.</p>
-<p>To try and get there, we will look at a regular let expression</p>
+<p>To try and get there, we will look at a regular let expression:</p>
 <pre><code class="language-ocaml">let &lt;pattern&gt; = &lt;expr1&gt; in
 &lt;expr2&gt;
 </code></pre>
-<p>Lets name the type of <code>expr1</code> <code>'a</code> and the type of <code>expr2</code> <code>'b</code>. <code>expr2</code> has a a
+<p>Lets name the type of <code>expr1</code> <code>'a</code> and the type of <code>expr2</code> <code>'b</code>. <code>expr2</code> has a
 free-variable bound to <code>&lt;pattern&gt;</code>. That free variable is of type <code>'a</code>. This can
 be interpreted as <code>&lt;pattern&gt;</code> and <code>expr2</code> together being of type <code>'a -&gt; 'b</code>.</p>
 <p>If we indeed chose to look at things this way, we can get this as the type of
-the let itself :</p>
+the let itself:</p>
 <pre><code class="language-ocaml">'a -&gt; ('a -&gt; 'b) -&gt; 'b
 </code></pre>
-<p>We can then define a function that has this type :</p>
-<pre><code class="language-ocaml">let impractical_let (v : 'a) (f : 'a -&gt; 'b) : 'b =
+<p>We can then define a function that has this type:</p>
+<pre><code class="language-ocaml">let impractical_let (v&amp;nbsp;: 'a) (f&amp;nbsp;: 'a -&gt; 'b)&amp;nbsp;: 'b =
     f v
 </code></pre>
-<p>And use it as you would a let statement :</p>
+<p>And use it as you would a let statement:</p>
 <pre><code class="language-ocaml">impractical_let &lt;expr1&gt; (fun &lt;pattern&gt; -&gt; &lt;expr2&gt;)
 </code></pre>
 <p>In OCaml, this has approximately the same behavior, but the real let notation is
-just way better. Still, there is something interesting here :
+just way better. Still, there is something interesting here:
 <code>impractical_let</code>'s type look a lot like the signature of <code>map</code> or <code>bind</code> in a
 monad. The only difference is that <code>bind</code> and <code>map</code> have extra <code>t</code>s in the
-signature, and that the only syntax available for them is the impractical one :</p>
+signature, and that the only syntax available for them is the impractical one:</p>
 <pre><code class="language-ocaml">bind &lt;expr1&gt; (fun &lt;pattern&gt; -&gt; &lt;expr2&gt;)
 </code></pre>
 <p>So we can define a new syntax to use <code>bind</code> or <code>map</code> as if it was a regular let
-binding. In OCaml this is done with the let-operators syntax :</p>
+binding. In OCaml this is done with the let-operators syntax:</p>
 <pre><code class="language-ocaml">let ( let* ) v f = bind v f
 let ( let+ ) v f = map f v (* map usually has reverse order arguments. *)
 </code></pre>
@@ -73,64 +73,64 @@ let ( let+ ) v f = map f v (* map usually has reverse order arguments. *)
 </code></pre>
 <p>is parsed to <code>(let*) expr1 (fun &lt;pattern&gt; -&gt; &lt;expr2&gt;)</code>, that is
 <code>bind expr1 (fun &lt;pattern&gt; -&gt; &lt;expr2&gt;)</code>.</p>
-<p>We can see by using this this that it works very well, but this still does not
-explain everything : why this signature ? What happens if you have <code>map</code> and not
-<code>bind</code> ?</p>
-<h2>Why monads ?</h2>
+<p>We can see by using this that it works very well, but it still does not
+explain everything: why this signature? What happens if you have <code>map</code> and not
+<code>bind</code>?</p>
+<h2>Why monads?</h2>
 <p>Here we will explain why the monad signature is important and its meaning.</p>
 <p>First we can notice that <code>map</code> is not strictly necessary because you can
-implement it with <code>bind</code> and <code>return</code> :</p>
+implement it with <code>bind</code> and <code>return</code>:</p>
 <pre><code class="language-ocaml">let map f m = bind m (fun v -&gt; return (f v))
 </code></pre>
-<p>We will explain later in english what this means.</p>
+<p>We will explain later in English what this means.</p>
 <p>To explain what a monad is, we will look at its <code>'a t</code> in a other way. Most of
 the time, we look at a type <code>'a t</code> as a <code>t</code> that contains an <code>'a</code>. That makes
 a lot of sense for <code>'a list</code>.</p>
 <p>In the case of a monad we need to look at it as a way to compute an <code>'a</code>. This
-makes sense for common monads :</p>
+makes sense for common monads:</p>
 <ul>
 <li><code>'a Lwt.t</code> is a way to compute an <code>'a</code> asynchronously.</li>
 <li><code>'a Option.t</code> is a way to compute an <code>'a</code> that may fail.</li>
 </ul>
-<p>It would not make sense to state that an <code>'a Lwt.t</code> contains an <code>'a</code> : it might
-not &quot;contain&quot; it just yet. Likewise for an <code>'a Option.t</code>, there might not be a
+<p>It would not make sense to state that an <code>'a Lwt.t</code> contains an <code>'a</code>: it might
+not &quot;contains&quot; it just yet. Likewise for an <code>'a Option.t</code>, there might not be a
 single <code>'a</code> in here.</p>
 <p>Even <code>'a list</code> can be seen a way to compute an <code>'a</code> that may have multiple
 results. We can call this a &quot;non deterministic computation&quot; as its results are
-multiple or none and &quot;the result&quot; is not determined.</p>
+multiple or none and the &quot;result&quot; is not determined.</p>
 <p>We will use this monad in the following explanation. For lists, <code>map</code>
 is well known, but <code>bind</code> less so. <code>bind</code> is actually the same as
-<code>concat_map : 'a list -&gt; ('a -&gt; 'b list) -&gt; 'b list</code>.</p>
-<p>When we view things this way, <code>map</code>'s arguments are :</p>
+<code>concat_map&amp;nbsp;: 'a list -&gt; ('a -&gt; 'b list) -&gt; 'b list</code>.</p>
+<p>When we view things this way, <code>map</code>'s arguments are:</p>
 <ul>
-<li><code>'a -&gt; 'b</code> a regular computation that depends on another regular computation</li>
-<li><code>'a t</code> a computation of an <code>'a</code> that returned multiple results</li>
+<li><code>'a -&gt; 'b</code> a regular computation that depends on another regular computation;</li>
+<li><code>'a t</code> a computation of an <code>'a</code> that returned multiple results.</li>
 </ul>
 <p>So <code>map</code> itself is a way to make a regular computation that depends on a
 non-deterministic computation. The final result is non-deterministic, as it
 should be.</p>
-<p>Lets look at bind :</p>
+<p>Lets look at bind:</p>
 <ul>
 <li><code>'a t</code> is a non-deterministic computation.</li>
 <li><code>'a -&gt; 'b t</code> is a non-deterministic computation that depends on a regular one.</li>
 </ul>
 <p>So <code>bind</code> is a way to make a non-deterministic computation that depends on
 another non-deterministic computation.</p>
-<p>Understanding <code>return</code> is even simpler : it turns a regular compution into
-a non-determistic one. It is a bit artificial : it is going to give only
+<p>Understanding <code>return</code> is even simpler: it turns a regular compution into
+a non-determistic one. It is a bit artificial: it is going to give only
 one possible result.</p>
-<h2>Example : Sudoku</h2>
-<p>Lets look a real use-case of non-deterministic computation : solving a sudoku.
+<h2>Example: Sudoku</h2>
+<p>Lets look a real use-case of non-deterministic computation: solving a sudoku.
 When you solve a sudoku, you have a set of legal digits to put in each cell, but
 choosing the wrong one may block you later.</p>
-<p>We are going to place ourselves in a very abstract sudoku :</p>
+<p>We are going to place ourselves in a very abstract sudoku:</p>
 <ul>
 <li>Empty cells are represented by ints from <code>0</code> to <code>n_cells</code>.</li>
 <li>A digit <code>i</code> in cell <code>cell</code> is legal if <code>legal_move ~cells ~cell i</code> returns
 true. <code>cells</code> is a list of size <code>i - 1</code> with the digits put in the previous
 cells. This <code>legal</code> function exists for one instance of a sudoku problem.</li>
 </ul>
-<p>We can solve the sudoku with the following code :</p>
+<p>We can solve the sudoku with the following code :</p>
 <pre><code class="language-ocaml">let digits = [1; 2; 3; 4; 5; 6; 7; 8; 9] in
 (* [digit] is one element of [digits], we do not know which one. The below code
    is going to run once for each possible value of [digit] *)
@@ -139,7 +139,7 @@ let* cell_0 =
   if is_legal ~cells:[] ~cell:0 digit then
     return digit
   else
-    (* If this branch is executed, the execution stops here : [concat_map f []]
+    (* If this branch is executed, the execution stops here&amp;nbsp;: [concat_map f []]
        does not call [f] *)
     []
 in
@@ -159,27 +159,27 @@ in
 [cell_0; cell_1; ...; cell_n]
 </code></pre>
 <p>A working version can be found in <a href="sudoku_monad.ml">sudoku_monad.ml</a></p>
-<p>The above code has type <code>int list list</code>, which make sense because a solution is
+<p>The above code has type <code>int list list</code>, which makes sense because a solution is
 a list of digits to put in cells, and there can be multiple solutions to a
 sudoku.</p>
 <p>You can notice that we use <code>let+</code>/<code>map</code> only once. The reason for that is that
-every cell depends on non-deterministic computations : the choice of the digit,
+every cell depends on non-deterministic computations: the choice of the digit,
 and the previous cells. The last cell does not have a non-deterministic
-computation that depends on it : we just return the list of cells afterwards.</p>
+computation that depends on it: we just return the list of cells afterwards.</p>
 <p>You can find exercices on the non-deterministic monad by Francois Pottier
 <a href="https://ocaml-sf.org/learn-ocaml-public/exercise.html#id=fpottier/nondet_monad_seq">here</a>.</p>
 <p>Be aware that the exercise do not use the <code>let*</code>/<code>let+</code> syntax, but an infix one.
 This syntax used to be very common in the OCaml ecosystem before let operators
 were available. They also try and make the non-determinism usable in reality,
 by caring about performance.</p>
-<h2>What if you do not have bind ?</h2>
-<p>The following signature is called a functor :</p>
+<h2>What if you do not have bind?</h2>
+<p>The following signature is called a functor:</p>
 <pre><code class="language-ocaml">module type Functor = sig
   type 'a t
 
-  val return : 'a -&gt; 'a t
+  val return&amp;nbsp;: 'a -&gt; 'a t
 
-  val map : ('a -&gt; 'b) -&gt; 'a t -&gt; 'b t
+  val map&amp;nbsp;: ('a -&gt; 'b) -&gt; 'a t -&gt; 'b t
 end
 </code></pre>
 <p>It is not to be confused with the language feature of the same name and is a
@@ -187,22 +187,22 @@ monad that lacks bind. As we saw earlier <code>bind</code> allows to do a specia
 computation that depends on another special computation. <code>map</code> does a regular
 computation that depends on a special one. Therefore if you only have <code>map</code> you
 cannot chain special computations. This can be useful to model certain things.</p>
-<p>For instance, in the OCaml environnement; Cmdliner works like that. Cmdliner is
+<p>For instance, in the OCaml environnement, Cmdliner works like that. Cmdliner is
 a library to specify command line interfaces. I will explain a simplified
 version of this library. You can express command line option declaratively,
 which returns an <code>'a Arg.t</code>. The <code>'a</code> of the <code>'a t</code> is the value associated with
 the command line argument. For a simple flag it would be <code>bool</code>, but you can
 have more complex arguments that take values. We can view <code>'a Arg.t</code> as a
-special way to compute an <code>'a</code> : The user will input it on the command line.
-There is however a limitation : There is a <code>let+</code>/<code>map</code> function, but not a
+special way to compute an <code>'a</code>: the user will input it on the command line.
+There is however a limitation: there is a <code>let+</code>/<code>map</code> function, but not a
 <code>let*</code>/<code>bind</code> one, because you cannot declare a command line argument that
 depend on the result of another one. This make sense because allowing this would
-permit some very weird interfaces like the following :</p>
+permit some very weird interfaces like the following:</p>
 <pre><code>cmd --my_option=&lt;text_1&gt; --&lt;text_2&gt; ...
 </code></pre>
 <p>where the command is valid only if <code>text_1</code> is equal to <code>text_2</code>.</p>
 <p>If there was a <code>let*</code>/<code>bind</code> function in Cmdliner, you would program the above
-command line interface like this :</p>
+command line interface like this:</p>
 <pre><code>let* option = option_string &quot;my_option&quot; in
 let* option_flag = flag option in
 ...
@@ -210,7 +210,7 @@ let* option_flag = flag option in
 <p>If you replace every <code>let*</code>/<code>bind</code> by a <code>let+</code>/<code>map</code>, it will return you an <code>'a t t</code> instead of an <code>'a t</code>, that is a command line argument that returns a
 command line argument that returns an <code>'a</code>, and there is no way to run that in
 Cmdliner, for the reason of such command-line interfaces being indesirable.</p>
-<p>We can view this in terms of parsing; Cmdliner parses command line argument : a
+<p>We can view this in terms of parsing; Cmdliner parses command line argument: a
 monad would allow to parse a context-sensitive grammar, where a functor
 restricts possible grammars to context-free ones.</p>
 <p>To be more precise, <code>Cmdliner</code> is actually an applicative functor, which is
