@@ -465,6 +465,9 @@ img, video {
   margin-top: 0.2em;
   font-style: italic;
 }
+.img + .caption em {
+  font-style: normal;
+}
 
 :root {
   --source-code-comment: var(--gray);
