@@ -4,12 +4,12 @@
 <pre><code class="language-ocaml">module type Monad = sig
   type 'a t
 
-  val return&amp;nbsp;: 'a -&gt; 'a t
+  val return : 'a -&gt; 'a t
 
-  val bind&amp;nbsp;: 'a t -&gt; ('a -&gt; 'b t) -&gt; 'b t
+  val bind : 'a t -&gt; ('a -&gt; 'b t) -&gt; 'b t
 
-  val map&amp;nbsp;: ('a -&gt; 'b) -&gt; 'a t -&gt; 'b t
-  (* Different argument order than bind&amp;nbsp;: this is a meaningless convention *)
+  val map : ('a -&gt; 'b) -&gt; 'a t -&gt; 'b t
+  (* Different argument order than bind : this is a meaningless convention *)
 end
 </code></pre>
 <p>In this blog post, I will try to explain two important things around monads:</p>
@@ -50,7 +50,7 @@ the let itself:</p>
 <pre><code class="language-ocaml">'a -&gt; ('a -&gt; 'b) -&gt; 'b
 </code></pre>
 <p>We can then define a function that has this type:</p>
-<pre><code class="language-ocaml">let impractical_let (v&amp;nbsp;: 'a) (f&amp;nbsp;: 'a -&gt; 'b)&amp;nbsp;: 'b =
+<pre><code class="language-ocaml">let impractical_let (v : 'a) (f : 'a -&gt; 'b) : 'b =
     f v
 </code></pre>
 <p>And use it as you would a let statement:</p>
@@ -100,7 +100,7 @@ results. We can call this a &quot;non deterministic computation&quot; as its res
 multiple or none and the &quot;result&quot; is not determined.</p>
 <p>We will use this monad in the following explanation. For lists, <code>map</code>
 is well known, but <code>bind</code> less so. <code>bind</code> is actually the same as
-<code>concat_map&amp;nbsp;: 'a list -&gt; ('a -&gt; 'b list) -&gt; 'b list</code>.</p>
+<code>concat_map : 'a list -&gt; ('a -&gt; 'b list) -&gt; 'b list</code>.</p>
 <p>When we view things this way, <code>map</code>'s arguments are:</p>
 <ul>
 <li><code>'a -&gt; 'b</code> a regular computation that depends on another regular computation;</li>
@@ -130,7 +130,7 @@ choosing the wrong one may block you later.</p>
 true. <code>cells</code> is a list of size <code>i - 1</code> with the digits put in the previous
 cells. This <code>legal</code> function exists for one instance of a sudoku problem.</li>
 </ul>
-<p>We can solve the sudoku with the following code :</p>
+<p>We can solve the sudoku with the following code :</p>
 <pre><code class="language-ocaml">let digits = [1; 2; 3; 4; 5; 6; 7; 8; 9] in
 (* [digit] is one element of [digits], we do not know which one. The below code
    is going to run once for each possible value of [digit] *)
@@ -139,7 +139,7 @@ let* cell_0 =
   if is_legal ~cells:[] ~cell:0 digit then
     return digit
   else
-    (* If this branch is executed, the execution stops here&amp;nbsp;: [concat_map f []]
+    (* If this branch is executed, the execution stops here : [concat_map f []]
        does not call [f] *)
     []
 in
@@ -173,13 +173,15 @@ This syntax used to be very common in the OCaml ecosystem before let operators
 were available. They also try and make the non-determinism usable in reality,
 by caring about performance.</p>
 <h2>What if you do not have bind?</h2>
-<p>The following signature is called a functor:</p>
+<p>The following signature is called an applicative functor:</p>
 <pre><code class="language-ocaml">module type Functor = sig
   type 'a t
 
-  val return&amp;nbsp;: 'a -&gt; 'a t
+  val return : 'a -&gt; 'a t
 
-  val map&amp;nbsp;: ('a -&gt; 'b) -&gt; 'a t -&gt; 'b t
+  val map : ('a -&gt; 'b) -&gt; 'a t -&gt; 'b t
+
+  val prod : 'a t -&gt; 'b t -&gt; ('a * 'b) t
 end
 </code></pre>
 <p>It is not to be confused with the language feature of the same name and is a
@@ -211,14 +213,48 @@ let* option_flag = flag option in
 command line argument that returns an <code>'a</code>, and there is no way to run that in
 Cmdliner, for the reason of such command-line interfaces being indesirable.</p>
 <p>We can view this in terms of parsing; Cmdliner parses command line argument: a
-monad would allow to parse a context-sensitive grammar, where a functor
+monad would allow to parse a context-sensitive grammar, where an applicative functor
 restricts possible grammars to context-free ones.</p>
-<p>To be more precise, <code>Cmdliner</code> is actually an applicative functor, which is
-slightly more powerful than the presented functor, but still does not have bind,
-and also only allows to parse context-free grammar.</p>
+<p>You may notice there is also a <code>prod</code> function in the presented signature. The
+<code>prod</code> function allows to do a regular computation that depends on multiple
+special ones, but that enforces that the special computation do not depend on
+each other. Its corresponding let-syntax is <code>and+</code>. This is useful in the
+context of commandline interface definition, it allows you to define commandline
+application with multiple arguments:</p>
+<pre><code class="language-bash">divide --dividend 124 --divisor 2
+</code></pre>
+<pre><code class="language-ocaml">let+ dividend = option_int &quot;dividend&quot;
+and+ divisor = option_int &quot;divisor&quot; in
+dividend / divisor
+</code></pre>
+<p>which is equivalent to :</p>
+<pre><code class="language-ocaml">map (prod (option_int &quot;dividend&quot;) (option_int &quot;divisor&quot;))
+  (fun (dividend, divisor) -&gt; dividend / divisor)
+</code></pre>
+<p>In the context of monad, you can implement <code>prod</code> using <code>bind</code>, which makes
+sense because if <code>e2</code> does not mention <code>x</code>, then :</p>
+<pre><code class="language-ocaml">let x = e1
+and y = e2 in
+...
+</code></pre>
+<p>is equivalent to</p>
+<pre><code class="language-ocaml">let x = e1 in
+let y = e2 in
+...
+</code></pre>
+<p>The difference between the two is that the first enforces that <code>e2</code> does not
+mention <code>x</code>, but appart from that they are similar. If you had a monadic
+<code>Cmdliner</code>, you could write:</p>
+<pre><code class="language-ocaml">let* dividend = option_int &quot;dividend&quot; in
+let* divisor = option_int &quot;divisor&quot; in
+dividend / divisor
+</code></pre>
+<p>and that would have the same behaviour as the applicative version.</p>
 <h2>Conclusion</h2>
 <p>To sum things up, a monad is in interface that provides a way to make special
 computations that can depend on other special computations of the same kind.
 Computations are nicely expressed by let-bindings instead of anonymous
 functions, and in OCaml we have them even for special computations.</p>
+<p>Applicative functors is a weaker interface that provides a way to make a special
+computations that are guaranteed not to depend on other special computations.</p>
 </article></div><script src="/highlight.js"></script><script src="/voronoi.js"></script></body></html>

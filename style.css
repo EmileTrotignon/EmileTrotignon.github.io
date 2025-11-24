@@ -83,8 +83,11 @@ body {
   background-attachment: fixed;
   font-family: "Fira Code", sans-serif;
   font-size: 14px;
+}
+body {
   --bg-sep: calc(30vh - sin(var(--bg-angle)) * 100vw / 2);
 }
+
 :root {
   --margin-top-body: 1rem;
 }
