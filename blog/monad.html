@@ -4,12 +4,12 @@
 <pre><code class="language-ocaml">module type Monad = sig
   type 'a t
 
-  val return : 'a -&gt; 'a t
+  val return : 'a -&gt; 'a t
 
-  val bind : 'a t -&gt; ('a -&gt; 'b t) -&gt; 'b t
+  val bind : 'a t -&gt; ('a -&gt; 'b t) -&gt; 'b t
 
-  val map : ('a -&gt; 'b) -&gt; 'a t -&gt; 'b t
-  (* Different argument order than bind : this is a meaningless convention *)
+  val map : ('a -&gt; 'b) -&gt; 'a t -&gt; 'b t
+  (* Different argument order than bind : this is a meaningless convention *)
 end
 </code></pre>
 <p>In this blog post, I will try to explain two important things around monads:</p>
@@ -50,7 +50,7 @@ the let itself:</p>
 <pre><code class="language-ocaml">'a -&gt; ('a -&gt; 'b) -&gt; 'b
 </code></pre>
 <p>We can then define a function that has this type:</p>
-<pre><code class="language-ocaml">let impractical_let (v : 'a) (f : 'a -&gt; 'b) : 'b =
+<pre><code class="language-ocaml">let impractical_let (v : 'a) (f : 'a -&gt; 'b) : 'b =
     f v
 </code></pre>
 <p>And use it as you would a let statement:</p>
@@ -100,7 +100,7 @@ results. We can call this a &quot;non deterministic computation&quot; as its res
 multiple or none and the &quot;result&quot; is not determined.</p>
 <p>We will use this monad in the following explanation. For lists, <code>map</code>
 is well known, but <code>bind</code> less so. <code>bind</code> is actually the same as
-<code>concat_map : 'a list -&gt; ('a -&gt; 'b list) -&gt; 'b list</code>.</p>
+<code>concat_map : 'a list -&gt; ('a -&gt; 'b list) -&gt; 'b list</code>.</p>
 <p>When we view things this way, <code>map</code>'s arguments are:</p>
 <ul>
 <li><code>'a -&gt; 'b</code> a regular computation that depends on another regular computation;</li>
@@ -130,7 +130,7 @@ choosing the wrong one may block you later.</p>
 true. <code>cells</code> is a list of size <code>i - 1</code> with the digits put in the previous
 cells. This <code>legal</code> function exists for one instance of a sudoku problem.</li>
 </ul>
-<p>We can solve the sudoku with the following code :</p>
+<p>We can solve the sudoku with the following code :</p>
 <pre><code class="language-ocaml">let digits = [1; 2; 3; 4; 5; 6; 7; 8; 9] in
 (* [digit] is one element of [digits], we do not know which one. The below code
    is going to run once for each possible value of [digit] *)
@@ -139,7 +139,7 @@ let* cell_0 =
   if is_legal ~cells:[] ~cell:0 digit then
     return digit
   else
-    (* If this branch is executed, the execution stops here : [concat_map f []]
+    (* If this branch is executed, the execution stops here : [concat_map f []]
        does not call [f] *)
     []
 in
@@ -177,11 +177,11 @@ by caring about performance.</p>
 <pre><code class="language-ocaml">module type Functor = sig
   type 'a t
 
-  val return : 'a -&gt; 'a t
+  val return : 'a -&gt; 'a t
 
-  val map : ('a -&gt; 'b) -&gt; 'a t -&gt; 'b t
+  val map : ('a -&gt; 'b) -&gt; 'a t -&gt; 'b t
 
-  val prod : 'a t -&gt; 'b t -&gt; ('a * 'b) t
+  val prod : 'a t -&gt; 'b t -&gt; ('a * 'b) t
 end
 </code></pre>
 <p>It is not to be confused with the language feature of the same name and is a
@@ -227,12 +227,12 @@ application with multiple arguments:</p>
 and+ divisor = option_int &quot;divisor&quot; in
 dividend / divisor
 </code></pre>
-<p>which is equivalent to :</p>
+<p>which is equivalent to :</p>
 <pre><code class="language-ocaml">map (prod (option_int &quot;dividend&quot;) (option_int &quot;divisor&quot;))
   (fun (dividend, divisor) -&gt; dividend / divisor)
 </code></pre>
 <p>In the context of monad, you can implement <code>prod</code> using <code>bind</code>, which makes
-sense because if <code>e2</code> does not mention <code>x</code>, then :</p>
+sense because if <code>e2</code> does not mention <code>x</code>, then :</p>
 <pre><code class="language-ocaml">let x = e1
 and y = e2 in
 ...

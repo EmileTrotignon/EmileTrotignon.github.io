@@ -13,15 +13,15 @@ It would allow us to do as following:</p>
 <pre><code class="language-ocaml">module type Printable = sig
   type t
 
-  val print : t -&gt; out_channel -&gt; unit
+  val print : t -&gt; out_channel -&gt; unit
 end
 
 (* Such constraints are not possible in OCaml for now *)
-let print (M : Printable) (v : M.t) out_channel =
+let print (M : Printable) (v : M.t) out_channel =
   M.print v out_channel
 
 let () =
-  (* Here is the implicit part : you do not need to give the module [Int], it is
+  (* Here is the implicit part : you do not need to give the module [Int], it is
      selected automatically because it fits the signature *)
   print 123
 </code></pre>
@@ -49,7 +49,7 @@ the module: <code>print Int 123</code> is not that different from <code>Int.prin
 good, but a lot of langages that have a typeclass-like thing for printing do not
 have very good type inference, and (almost) catching up with them would only
 require small changes to the Stdlib.</p>
-<p>In c++, you could write :</p>
+<p>In c++, you could write :</p>
 <pre><code class="language-c++">int x = 123;
 cout &lt;&lt; x;
 </code></pre>
@@ -62,7 +62,7 @@ equally reasonable ways to print.</p>
 <p>There is also the case of types that have an abstract parameter like <code>'a list</code>.
 In that case, you need an extra argument to the <code>print</code> function. The comparison
 then becomes</p>
-<pre><code class="language-c++">vector&lt;int&gt; arr = {1; 2 ;3};
+<pre><code class="language-c++">vector&lt;int&gt; arr = {1; 2 ;3};
 cout &lt;&lt; arr;
 </code></pre>
 <pre><code class="language-ocaml">let arr = [|1; 2; 3|] in
@@ -73,7 +73,7 @@ still very much manageable, and it would be possible to write a small syntax
 extension that removes this annoyance. It could look like that, and it does not
 need to part of the stdlib:</p>
 <pre><code class="language-ocaml">let arr = [|1; 2; 3|] in
-print_endline {%fmt|arr = %{arr : Array[Int]} |}
+print_endline {%fmt|arr = %{arr : Array[Int]} |}
 </code></pre>
 <p>One thing that OCaml would still be bad at is printing value with abstract types.
 In c++ you could do:</p>
@@ -84,7 +84,7 @@ void f( vector&lt;T&gt; arr) {
 }
 </code></pre>
 <p>whereas in ocaml, you would need to do the following:</p>
-<pre><code class="language-ocaml">let f (arr : 'a array) =
+<pre><code class="language-ocaml">let f (arr : 'a array) =
   Array.print ???.print arr
 </code></pre>
 <p>which is not possible.</p>

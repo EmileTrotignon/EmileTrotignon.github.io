@@ -7,7 +7,7 @@ consequences. These consequences are often referred to by the complicated terms
 <p>I will use notations from the OCaml langage. You may skip this section if you
 are familiar with it.</p>
 <ul>
-<li><code>val v : t</code> means that there is value <code>v</code> that has type <code>t</code>.</li>
+<li><code>val v : t</code> means that there is value <code>v</code> that has type <code>t</code>.</li>
 <li><code>a -&gt; b</code> is the type of functions that take an argument of type <code>a</code> and return
 a value of type <code>b</code>.</li>
 <li><code>f a</code> is the application of the function <code>f</code> to the value <code>a</code>.</li>
@@ -24,24 +24,24 @@ classes but also polymorphic variants.</p>
 <p>Let us consider the example of the types <code>square</code> and <code>rectangle</code>.
 Naturally, we have <code>square &lt; rectangle</code>.
 If you have:</p>
-<pre><code class="language-ocaml">val f : rectangle -&gt; int
+<pre><code class="language-ocaml">val f : rectangle -&gt; int
 
-val v : square
+val v : square
 </code></pre>
 <p>then <code>f v</code> is well-typed.
 Depending on the language, some kind of explicit instruction to consider that
 <code>v</code> is of type <code>Rectangle</code> may be needed.</p>
 <h2>Covariance</h2>
 <p>Lets imagine that we have the following values:</p>
-<pre><code class="language-ocaml">val high1 : (int -&gt; square) -&gt; square
+<pre><code class="language-ocaml">val high1 : (int -&gt; square) -&gt; square
 
-val high2 : (int -&gt; rectangle) -&gt; square
+val high2 : (int -&gt; rectangle) -&gt; square
 
-val f : int -&gt; square
+val f : int -&gt; square
 
-val g : int -&gt; rectangle
+val g : int -&gt; rectangle
 </code></pre>
-<p>If you are unfamiliar with this notation : <code>high1</code> takes a function as argument,
+<p>If you are unfamiliar with this notation : <code>high1</code> takes a function as argument,
 this function has to have type <code>int -&gt; square</code>.</p>
 <p>It is very clear that <code>high1 f</code> is well typed, and same is true for <code>high2 g</code>.
 The question is whether <code>high1 g</code> or <code>high2 f</code> are well typed.</p>
@@ -63,20 +63,20 @@ ill-typed.</p>
 whether we are talking a sub-type or a super-type.</p>
 <h2>Contravariance</h2>
 <p>Lets imagine that we have the following values:</p>
-<pre><code class="language-ocaml">val high1 : (square -&gt; int) -&gt; int
+<pre><code class="language-ocaml">val high1 : (square -&gt; int) -&gt; int
 
-val high2 : (rectangle -&gt; int) -&gt; int
+val high2 : (rectangle -&gt; int) -&gt; int
 
-val f : square -&gt; int
+val f : square -&gt; int
 
-val g : rectangle -&gt; int
+val g : rectangle -&gt; int
 </code></pre>
 <p>Once again, it is very clear that <code>high1 f</code> is well typed, and same is true for
 <code>high2 g</code>. The question is whether <code>high1 g</code> or <code>high2 f</code> are well typed.</p>
 <p>When we run <code>high2 f</code>, what will happen is that <code>high2</code> will be allowed to call
-<code>g : square -&gt; int</code> with an argument of type <code>rectangle</code>. This is an error.</p>
+<code>g : square -&gt; int</code> with an argument of type <code>rectangle</code>. This is an error.</p>
 <p>When we run<code>high1 g</code>, what will happen is that <code>high1</code> will be allowed to call
-<code>g : rectangle -&gt; int</code> with an argument of type <code>square</code>. This is fine.</p>
+<code>g : rectangle -&gt; int</code> with an argument of type <code>square</code>. This is fine.</p>
 <p>This means that if <code>square &lt; rectangle</code>, then
 <code>(rectangle -&gt; int) &lt; (square -&gt; int)</code>, because a function with an argument of
 type <code>(square -&gt; int)</code> can be called value of type <code>(rectangle -&gt; int)</code>.</p>
@@ -96,13 +96,13 @@ function. We can write this the following way:</p>
 that the answer is no. Both assertions are false. Lets show it in a more
 convincing by example.</p>
 <p>Lets assume the following environment:</p>
-<pre><code class="language-ocaml">val new_rectangle : unit -&gt; rectangle
-val new_square : unit -&gt; square
+<pre><code class="language-ocaml">val new_rectangle : unit -&gt; rectangle
+val new_square : unit -&gt; square
 
-val print_rectangle : rectangle -&gt; unit
-val print_square : square -&gt; unit
+val print_rectangle : rectangle -&gt; unit
+val print_square : square -&gt; unit
 </code></pre>
-<p>We will now write the following function :</p>
+<p>We will now write the following function :</p>
 <pre><code class="language-ocaml">let set_to_new r =
   r.set (new_rectangle ())
 
@@ -112,11 +112,11 @@ let print_rectangle_ref r =
 let print_square_ref r =
   print_square (r.get ())
 </code></pre>
-<p>These functions have the following types :</p>
-<pre><code class="language-ocaml">val set_to_new : rectangle ref -&gt; unit
+<p>These functions have the following types :</p>
+<pre><code class="language-ocaml">val set_to_new : rectangle ref -&gt; unit
 
-val print_rectangle_ref : rectangle ref -&gt; unit
-val print_square_ref : square ref -&gt; unit
+val print_rectangle_ref : rectangle ref -&gt; unit
+val print_square_ref : square ref -&gt; unit
 </code></pre>
 <p>If we assume that <code>rectangle ref &lt; square ref</code>, then we may pass an argument of
 type <code>rectangle ref</code> to <code>print_square_ref</code>. This will obviously fail, the
@@ -167,24 +167,24 @@ contravariant.</p>
 <pre><code class="language-ocaml">type 'a read_only_array = {get: int -&gt; 'a; length: int}
 type 'a write_only_array = {set: 'a -&gt; int -&gt; unit; length: int}
 
-let make_read_only (arr : 'a array) : 'a read_only_array =
+let make_read_only (arr : 'a array) : 'a read_only_array =
   {get=arr.get; length=arr.length}
 
-let make_write_only (arr : 'a array) : 'a write_only_array =
+let make_write_only (arr : 'a array) : 'a write_only_array =
   {set=arr.set; length=arr.length}
 </code></pre>
 <p>And then we can convert arrays to either write only or read only, and use them
 as covariant or contravariant types.</p>
 <p>Lets look at at example.</p>
-<pre><code class="language-ocaml">val squares : square array
-val rectangles : rectangle array
+<pre><code class="language-ocaml">val squares : square array
+val rectangles : rectangle array
 
-let print_rect_array (arr: rectangle read_only_array) : unit =
+let print_rect_array (arr: rectangle read_only_array) : unit =
   for i=0 to arr.length - 1 do
     print_rect (arr.get (i))
   done
 
-let reset_square_array (arr: square write_only_array) : unit =
+let reset_square_array (arr: square write_only_array) : unit =
   for i=0 to arr.length - 1 do
     arr.set (new_square ()) i
   done
@@ -192,12 +192,12 @@ let reset_square_array (arr: square write_only_array) : unit =
 <p>Here you can use both functions on both <code>squares</code> and <code>rectangles</code>:</p>
 <pre><code class="language-ocaml">let main () =
   (* directly well-typed *)
-  print_rect_array (read_only_array rectangles) ;
+  print_rect_array (read_only_array rectangles) ;
   (* well-typed by covariance *)
-  print_rect_array (read_only_array square) ;
+  print_rect_array (read_only_array square) ;
 
   (* directly well-typed *)
-  reset_square_array (write_only_array squares) ;
+  reset_square_array (write_only_array squares) ;
   (* well-typed by contravariance *)
   reset_square_array (write_only_array rectangle)
 </code></pre>
@@ -206,27 +206,27 @@ let reset_square_array (arr: square write_only_array) : unit =
 regular functions). This would be very comfortable to use, and I believe this is
 what Java should have done.</p>
 <p>This type system would allow to following syntax:</p>
-<pre><code class="language-ocaml">val squares : square array
-val rectangles : rectangle array
+<pre><code class="language-ocaml">val squares : square array
+val rectangles : rectangle array
 
-let print_rect_array (read_only arr: rectangle array) : unit =
+let print_rect_array (read_only arr: rectangle array) : unit =
   for i=0 to arr.length - 1 do
     print_rect (arr.get (i))
   done
 
-let reset_square_array (write_only arr: square array) : unit =
+let reset_square_array (write_only arr: square array) : unit =
   for i=0 to arr.length - 1 do
     arr.set (new_square ()) i
   done
 
 let main () =
   (* directly well-typed *)
-  print_rect_array rectangles ;
+  print_rect_array rectangles ;
   (* well-typed by covariance *)
-  print_rect_array square ;
+  print_rect_array square ;
 
   (* directly well-typed *)
-  reset_square_array squares ;
+  reset_square_array squares ;
   (* well-typed by contravariance *)
   reset_square_array rectangle
 </code></pre>
